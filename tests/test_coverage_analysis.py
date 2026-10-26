@@ -26,7 +26,7 @@ class CoverageAnalysisTests(unittest.TestCase):
     def test_grid_reports_gap_distances_and_is_bounded(self):
         sensors = normalize_sensor_locations([
             {"sensor_id": "Q-1", "sensor_name": "West", "latitude": "40.7", "longitude": "-73.8", "borough": "Queens"},
-            {"sensor_id": "Q-2", "sensor_name": "East", "latitude": "40.7", "longitude": "-73.78", "borough": "Queens"},
+            {"sensor_id": "Q-2", "sensor_name": "East", "latitude": "40.7", "longitude": "-73.75", "borough": "Queens"},
         ])
         result = sample_monitoring_gaps(sensors)
         self.assertEqual(result["sensor_count"], 2)
