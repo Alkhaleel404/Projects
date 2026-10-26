@@ -80,6 +80,34 @@ These protections reduce some risks but do not constitute a professional securit
 
 Public services can be unavailable, incomplete, rate-limited, or updated independently. OpenStreetMap data does not certify sidewalk continuity, crossings, curb ramps, or accessibility. Route estimates do not account reliably for an individual's walking speed, mobility needs, weather, current closures, or flooding.
 
+## Deploy on Streamlit Community Cloud
+
+RainRoute is a Streamlit app and can be hosted directly from this repository. No API keys or secrets are required for the current feature set.
+
+1. Push the project to a GitHub repository you control.
+2. Open [Streamlit Community Cloud](https://share.streamlit.io/) and sign in with GitHub.
+3. Choose **Create app**, then select repository `Alkhaleel404/Projects`, branch `main`, and main file path `app.py`.
+4. In **Advanced settings**, select Python **3.12** if a version is requested. Leave secrets empty; the current app does not need them.
+5. Deploy. When the app finishes building, open its generated `.streamlit.app` URL and test a Queens origin and destination.
+6. After later commits to `main`, check the app's deployment status and logs if the hosted version does not update.
+
+If you fork or move the repository, choose your own repository and branch in step 3. The public geocoding, routing, and FloodNet services can rate-limit requests or be temporarily unavailable. Deployment does not make those services more reliable.
+
+### Release smoke test
+
+Before sharing the URL with judges, test the deployed app in a fresh browser session:
+
+- [ ] The page loads without a Python traceback.
+- [ ] A known Queens origin and destination return at least one route, when public services are available.
+- [ ] The map shows the route geometry and origin/destination markers.
+- [ ] Historical FloodNet context either loads with timestamps or shows a clear unavailable/empty state.
+- [ ] Route alternatives can be selected and their metrics update.
+- [ ] An invalid or out-of-area location produces a useful message instead of crashing.
+- [ ] The limitations and privacy notice are visible.
+- [ ] Test on a phone-sized viewport as well as desktop.
+
+Do not call the app production-validated until this smoke test has been completed. The app is an educational research demonstration, not an emergency service.
+
 ## Run locally
 
 Requirements: Python 3.11 or newer and an internet connection.
