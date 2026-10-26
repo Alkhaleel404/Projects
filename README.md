@@ -1,53 +1,47 @@
-# RainRoute NYC
+# FloodLens NYC
 
-**A Queens-focused civic evidence tool for exploring walking routes and nearby historical flood-sensor records.**
+**A Queens-focused civic research app that maps gaps in public urban flood-monitoring evidence.**
 
-RainRoute asks a narrow question: *What can public flood data tell us—and what can’t it tell us—about a mapped walking route?* It combines OpenStreetMap-based pedestrian routes with NYC FloodNet’s returned historical sensor records and makes the uncertainty visible instead of inventing a safety score.
+FloodLens asks: *Where are we missing the evidence needed to understand urban flooding?* It uses the published NYC FloodNet sensor inventory to measure proximity between a sampled geographic grid and the nearest listed sensor. It then places those coverage gaps alongside historical sensor-event context and optional walking-route analysis.
 
-> **Not for emergency decisions.** RainRoute does not detect live street flooding, verify current sidewalk conditions, or certify a route as safe or accessible. Historical sensor records are not live flood status. A route with no nearby records may still be flooded. Follow current official alerts and local instructions.
+> **Important:** FloodLens is an exploratory civic-data project, not a flood prediction, emergency, or safety service. A location far from a sensor is not necessarily at higher flood risk. A location near a sensor is not necessarily safe. Sensor distance is only a proxy for direct monitoring coverage.
 
-## What it does
+## What makes it different
 
-- **Maps real route alternatives** between two entered Queens locations, when public services return them.
-- **Compares route geometry** by distance and the routing service’s estimated travel time.
-- **Shows nearby FloodNet evidence** by measuring the approximate distance from sensor points to the selected route.
-- **Makes limitations explicit**: the 300 m radius is a display filter, not a validated impact zone. The current data request is limited, and the display uses the latest returned historical record for each matched sensor—not a complete count of all past flood events.
-- **Keeps the experience low-data**: no account, device geolocation, app database, saved trip history, or public report submission.
+- **Coverage-gap analysis:** fetches the Queens FloodNet sensor inventory, including listed sensors that may not appear in the app's limited event query.
+- **Transparent spatial method:** samples a regular grid inside the sensor inventory's coordinate envelope and calculates great-circle distance to the nearest listed sensor.
+- **Inspectable results:** classifies sample points as within 1 km, 1–2 km, or over 2 km from a listed sensor and exposes the most distant sample locations.
+- **Historical evidence:** shows available FloodNet historical event summaries without describing them as live street conditions.
+- **Optional route investigation:** compares public walking-route alternatives and nearby historical sensor context.
+- **Privacy-conscious design:** no account, device geolocation, saved trip history, app database, or public report submission.
 
-## How to read the results
+## How to interpret the coverage map
 
-| You see | It means | It does **not** mean |
+| Display | What it means | What it does not mean |
 |---|---|---|
-| Route line | A public routing service returned this path from OpenStreetMap-based network data | Every sidewalk, crossing, curb ramp, or path is present, open, safe, or accessible |
-| Distance and time | The routing service’s estimate for the returned route | A guarantee of actual travel time |
-| Nearby FloodNet record | A historical measurement was associated with a sensor near the route | That the route is flooded now—or that nearby streets are dry |
-| No nearby records | No records returned by this query met the app’s distance filter | No flood risk or no past flooding |
+| Sensor marker | A sensor location listed in the public FloodNet inventory | Proof that the sensor is currently online or representative of surrounding streets |
+| Grid point within 1 km | The sample is within 1 km of a listed sensor | The area is adequately monitored |
+| Grid point over 2 km away | The sample is more than 2 km from every listed sensor | The area has greater flood risk or has flooded before |
+| Sample-point percentage | Share of the generated grid points in a distance band | Borough-wide land-area percentage; the sampling envelope can include water and non-residential land |
+| Historical event | A past sensor measurement in the returned records | Current water depth or current street conditions |
+| No nearby event | No returned event met the selected distance filter | No past flooding or no present risk |
 
-The app does not calculate a route safety score, predict flooding, or label routes safe/unsafe. FloodNet context can fail independently while route results remain available.
+The 1 km and 2 km bands are exploratory display thresholds, not validated standards for monitoring adequacy. The grid covers the rectangular coordinate envelope of the returned sensor inventory, not the full Queens administrative boundary. The current event request is limited to the 100 latest returned rows and is not a complete historical archive.
 
 ## Data sources
 
-- [OpenStreetMap Nominatim](https://operations.osmfoundation.org/policies/nominatim/) — place-name/address geocoding.
-- [OpenStreetMap contributors](https://www.openstreetmap.org/copyright) — map and pedestrian-network data (© OpenStreetMap contributors, ODbL).
-- [FOSS GIS public routing service](https://routing.openstreetmap.de/about.html) — route geometry, distance, and estimated time.
-- [NYC Open Data / FloodNet historical street-flooding events](https://data.cityofnewyork.us/Environment/FloodNet-Street-Flooding-Events-Measured-by-FloodN/aq7i-eu5q) and [FloodNet project](https://www.floodnet.nyc/) — historical sensor-event summaries and deployment metadata.
+- [NYC Open Data: FloodNet historical street-flooding events](https://data.cityofnewyork.us/Environment/FloodNet-Street-Flooding-Events-Measured-by-FloodN/aq7i-eu5q)
+- [NYC Open Data: FloodNet sensor metadata](https://data.cityofnewyork.us/)
+- [FloodNet project](https://www.floodnet.nyc/)
+- [OpenStreetMap contributors](https://www.openstreetmap.org/copyright) — map and pedestrian-network data.
+- [OpenStreetMap Nominatim usage policy](https://operations.osmfoundation.org/policies/nominatim/) — place-name geocoding.
+- [FOSS GIS public routing service](https://routing.openstreetmap.de/about.html) — route geometry and estimated travel time.
 
-See [DATA_SOURCES.md](DATA_SOURCES.md) for the source registry and [SECURITY_REVIEW.md](SECURITY_REVIEW.md) for privacy and security limits.
+See [DATA_SOURCES.md](DATA_SOURCES.md), [DEPLOYMENT.md](DEPLOYMENT.md), and [SECURITY_REVIEW.md](SECURITY_REVIEW.md) for more detail.
 
-## Deploy on Streamlit Community Cloud
+## Run locally
 
-1. Confirm the repository is pushed to your GitHub account: `Alkhaleel404/Projects`.
-2. Open [Streamlit Community Cloud](https://share.streamlit.io/) and sign in with GitHub.
-3. Choose **Create app**, repository **Alkhaleel404/Projects**, branch **main**, and main file **app.py**.
-4. Choose **Python 3.12** in Advanced settings if prompted. No secrets are required for the current version.
-5. Deploy and wait for the build to finish. Copy the generated `.streamlit.app` URL.
-6. Run the release smoke test below before sharing the link.
-
-**A GitHub commit does not itself publish the website.** The repository owner must complete hosting setup and confirm that the live URL works. See [DEPLOYMENT.md](DEPLOYMENT.md).
-
-## Local setup
-
-Python 3.12 is recommended. From the repository root:
+Python 3.12 is recommended.
 
 **Windows PowerShell**
 ```powershell
@@ -69,28 +63,40 @@ python3.12 -m venv .venv
 .venv/bin/python -m streamlit run app.py
 ```
 
-Keep the terminal open and use the local URL printed by Streamlit. The app requires an internet connection to contact its public data services.
+The app needs internet access to retrieve public data and routing responses.
+
+## Deploy to Streamlit Community Cloud
+
+1. Open [Streamlit Community Cloud](https://share.streamlit.io/) and sign in with GitHub.
+2. Create an app from repository `Alkhaleel404/Projects`, branch `main`, main file `app.py`.
+3. Select Python 3.12 if prompted; no secrets are required for the current version.
+4. Deploy and wait for the build to finish.
+5. Open the published URL and run the smoke tests below.
+
+A GitHub merge does not publish the app automatically. The repository owner must complete hosting setup and verify the resulting public URL.
 
 ## Release smoke test
 
-- [ ] App opens without a traceback in a fresh/private browser.
-- [ ] A known Queens origin and destination return a route when public services are available.
-- [ ] Route lines, origin/destination markers, and route selection work.
-- [ ] Historical records load, or the app displays a clear unavailable/empty state.
-- [ ] Changing the selected route updates route metrics and nearby-record context.
-- [ ] Invalid and out-of-area locations produce a useful message.
-- [ ] Privacy and uncertainty notices are visible.
-- [ ] Layout is usable on desktop and a phone-sized screen.
-- [ ] GitHub Actions validation passes on the deployed commit.
+- [ ] App loads without a traceback.
+- [ ] The coverage panel retrieves sensor inventory or shows a clear unavailable state.
+- [ ] Coverage points and sensor markers appear; tooltips show distance bands.
+- [ ] The most distant sample table contains valid coordinates and distances.
+- [ ] Route investigation returns a path for two known Queens locations when public services are available.
+- [ ] Historical events load or a clear empty/unavailable state appears.
+- [ ] The uncertainty and privacy notices are visible on desktop and mobile.
+- [ ] GitHub Actions passes on the deployed commit.
 
-Do not describe the app as production-validated until these checks are completed. Automated unit tests do not verify live third-party services, deployment health, accessibility, or emergency-use suitability.
+Automated tests do not verify third-party uptime, a live deployment, map rendering in every browser, accessibility, or suitability for emergency use.
 
-## Current limitations and next improvements
+## Current limitations and next research questions
 
-- Historical FloodNet coverage is sparse and the current request is bounded; it is not a complete historical archive.
-- No route-specific live flood observations or alert overlay is currently integrated.
-- Public geocoding and routing services can rate-limit requests or be unavailable, and providers may log submitted place text or coordinates.
-- OpenStreetMap data does not guarantee sidewalk continuity, curb ramps, crossings, closures, or accessibility.
-- Formal accessibility testing, load testing, and a professional security audit have not been performed.
+- The sensor-coordinate envelope is not a Queens boundary and may include water or non-residential areas.
+- Straight-line distance does not account for barriers, drainage basins, topography, flood pathways, sensor performance, or neighborhood population.
+- The distance thresholds are exploratory, not scientifically validated monitoring standards.
+- Historical event retrieval is bounded to the 100 latest returned rows and does not represent the complete event archive.
+- FloodNet coverage is sparse; sensor distance is not a flood-risk score.
+- FEMA hazard mapping is not currently part of the coverage-gap calculation.
+- Public geocoding/routing providers may log queries; services may rate-limit or fail.
+- No formal accessibility review, load test, or professional security audit has been performed.
 
-The most valuable next technical step is to integrate clearly timestamped official alerts as a separate context panel—not to turn incomplete data into a misleading “safe route” score.
+**Next research step:** compare the sensor-coverage grid with a clearly documented land/administrative boundary and relevant flood-hazard or vulnerability datasets, then validate whether the coverage gaps remain meaningful under alternative grid spacing and distance thresholds.
