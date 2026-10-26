@@ -202,7 +202,7 @@ def _route_map(start: dict[str, Any], end: dict[str, Any], routes: list[dict[str
     folium.Marker([start["lat"], start["lon"]], tooltip="Origin", popup="Origin", icon=folium.Icon(color="green", icon="play")).add_to(m)
     folium.Marker([end["lat"], end["lon"]], tooltip="Destination", popup="Destination", icon=folium.Icon(color="blue", icon="flag")).add_to(m)
     for row in events:
-        popup = f"{row['sensor']}<br>Recorded event: {row['event_time']}<br>Max depth: {row['depth']} in<br>Distance to route: {row['distance_m']} m"
+        popup = f"{row['sensor']}<br>Recorded event: {row['event_time']}<br>Max depth: {row['depth']} in<br>Event duration: {row['duration']} min<br>Distance to route: {row['distance_m']} m"
         folium.CircleMarker([row["lat"], row["lon"]], radius=6, color="#b45309", fill=True, fill_opacity=.85, tooltip="Historical FloodNet event", popup=popup).add_to(m)
     folium.LayerControl().add_to(m)
     return m
