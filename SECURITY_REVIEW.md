@@ -12,6 +12,7 @@ This is a project-level review, not a professional security audit or a guarantee
 - Route geometry is real OpenStreetMap-based pedestrian routing. FloodNet event points are compared geometrically with the selected route and only shown within the documented 300 m display threshold.
 - The app does not convert historical measurements into a current safe/unsafe label. A missing event is not evidence that a route is dry.
 - Streamlit usage statistics are disabled in .streamlit/config.toml; the documented local command binds to 127.0.0.1.
+- The interface uses system fonts rather than importing fonts from a separate font CDN, reducing unnecessary third-party browser requests.
 
 ## Remaining risks
 
