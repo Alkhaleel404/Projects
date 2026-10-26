@@ -23,20 +23,19 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
 :root { --ink:#17252c; --muted:#62727b; --line:#d8e0e3; --paper:#f2f5f4; --teal:#087e8b; --amber:#b86a1d; }
-html, body, [class*="css"] { font-family:'DM Sans',sans-serif; color:var(--ink); }
+html, body, [class*="css"] { font-family:Arial,Helvetica,sans-serif; color:var(--ink); }
 .stApp { background:var(--paper); }
 .block-container { max-width:1500px; padding-top:1.1rem; padding-bottom:3rem; }
-h1,h2,h3 { font-family:'Manrope',sans-serif; letter-spacing:-.035em; color:var(--ink); }
+h1,h2,h3 { font-family:Arial,Helvetica,sans-serif; letter-spacing:-.035em; color:var(--ink); }
 h2 { margin-top:.4rem; }
 .hero { padding:1.6rem 1.9rem; border:1px solid #1f3e46; border-radius:8px; background:#122c34; color:#fff; margin-bottom:1rem; position:relative; overflow:hidden; }
-.hero:after { content:"RR / FIELD SYSTEM 01"; position:absolute; right:1.5rem; bottom:1.1rem; font:500 .7rem 'DM Mono',monospace; letter-spacing:.1em; color:#86b8bc; }
+.hero:after { content:"RR / FIELD SYSTEM 01"; position:absolute; right:1.5rem; bottom:1.1rem; font:500 .7rem 'Courier New',monospace; letter-spacing:.1em; color:#86b8bc; }
 .hero h1 { color:white; font-size:clamp(2.1rem,4vw,3.25rem); line-height:1.02; margin:.55rem 0 .7rem; max-width:900px; }
 .hero p { color:#d1e0e2; font-size:1rem; max-width:850px; line-height:1.6; margin-bottom:.25rem; }
-.kicker { font:500 .72rem 'DM Mono',monospace; text-transform:uppercase; letter-spacing:.14em; color:#81ded0; }
+.kicker { font:500 .72rem 'Courier New',monospace; text-transform:uppercase; letter-spacing:.14em; color:#81ded0; }
 .notice { padding:.9rem 1rem; border-left:4px solid #c48a34; border-radius:3px; background:#fff8e9; color:#654c24; }
-.section-tag { font:500 .7rem 'DM Mono',monospace; letter-spacing:.12em; text-transform:uppercase; color:#527078; }
+.section-tag { font:500 .7rem 'Courier New',monospace; letter-spacing:.12em; text-transform:uppercase; color:#527078; }
 .panel { border:1px solid var(--line); border-radius:8px; padding:1rem 1.1rem; background:#fff; }
 .small-muted { color:var(--muted); font-size:.88rem; }
 [data-testid="stMetric"] { border:1px solid var(--line); border-radius:6px; padding:.9rem 1rem; background:#fff; }
@@ -46,7 +45,7 @@ div.stButton > button[kind="primary"] { background:#087e8b; }
 div[data-testid="stVerticalBlockBorderWrapper"] { border-radius:7px; }
 div[data-testid="stDataFrame"] { border:1px solid var(--line); border-radius:6px; overflow:hidden; }
 hr { border-color:var(--line); }
-code { font-family:'DM Mono',monospace; }
+code { font-family:'Courier New',monospace; }
 @media(max-width:700px){.hero{padding:1.2rem;border-radius:6px}.hero:after{display:none}.block-container{padding-left:.7rem;padding-right:.7rem}}
 </style>
 """, unsafe_allow_html=True)
@@ -265,7 +264,7 @@ if result:
         with right:
             st.markdown('<div class="section-tag">04 / Historical observations</div>', unsafe_allow_html=True)
             st.markdown("#### Nearby FloodNet records")
-            st.metric("Events within 300 m", str(len(nearby)))
+            st.metric("Historical records within 300 m", str(len(nearby)))
             if nearby:
                 for row in nearby:
                     with st.container(border=True):
@@ -286,7 +285,7 @@ if result:
                 "Route": f"Route {idx+1}",
                 "Distance (km)": round(route["distance_m"]/1000, 2),
                 "Router estimate (min)": max(1, round(route["duration_s"]/60)),
-                "Historical events within 300 m": len(matched),
+                "Historical records within 300 m": len(matched),
                 "Interpretation": "Historical context only; not a safety score",
             })
         st.dataframe(comparison, use_container_width=True, hide_index=True)
@@ -305,7 +304,7 @@ with d1:
     st.caption("Attribution: © OpenStreetMap contributors · ODbL")
 with d2:
     st.markdown("**Flood observations**")
-    st.write("NYC FloodNet sensor-event summaries provide historical quality-reviewed measurements. Nearby means a sensor point is within 300 metres of route geometry.")
+    st.write("NYC FloodNet sensor-event summaries provide historical quality-reviewed measurements. Nearby means a sensor point is within 300 metres of route geometry; the display uses the latest returned historical record per matched sensor, not a count of every event in the source dataset.")
     st.caption("Source: NYC Open Data / FloodNet")
 with d3:
     st.markdown("**Privacy and uncertainty**")
