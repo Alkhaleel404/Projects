@@ -1,24 +1,44 @@
 # RainRoute NYC — deployment runbook
 
-## App entry point
-- File: `app.py`
+## App configuration
+
 - Framework: Streamlit
-- Python: 3.12 recommended
-- Dependency file: `requirements.txt`
-- Required secrets: none for the current implementation
+- Entry point: `app.py`
+- Recommended Python: 3.12
+- Dependencies: `requirements.txt`
+- Required secrets/environment variables: none in the current implementation
+- Hosting target: Streamlit Community Cloud
 
-## Streamlit Community Cloud
-1. Sign in at https://share.streamlit.io/ using GitHub.
-2. Create an app from the repository `Alkhaleel404/Projects`.
-3. Select branch `main` and main file path `app.py`.
-4. Select Python 3.12 in Advanced settings if prompted.
-5. Deploy and wait for the build to complete.
-6. Open the generated app URL and perform the smoke test in README.md.
+## Publish
 
-The hosting account owner must complete deployment and accept the hosting provider's terms. A GitHub commit alone does not publish a live app.
+1. Confirm the latest intended code is on the repository's `main` branch.
+2. Open [Streamlit Community Cloud](https://share.streamlit.io/) and sign in with GitHub.
+3. Create an app using repository `Alkhaleel404/Projects`, branch `main`, and file path `app.py`.
+4. Select Python 3.12 in Advanced settings if prompted; leave secrets empty.
+5. Deploy and wait for the build status to finish.
+6. Open the generated public `.streamlit.app` URL and complete every check below.
+7. Save the deployed URL somewhere safe so it can be added to the project submission/demo materials.
+
+The repository owner must perform this hosting step and verify the resulting URL. Merging code does not publish or validate a live app.
+
+## Release smoke test
+
+- [ ] URL loads without a traceback, including in a signed-out/private browser.
+- [ ] Test a known Queens origin and destination; a route appears if the public router is available.
+- [ ] Select each returned route and confirm metrics and historical-record context update.
+- [ ] Check map attribution and origin/destination markers.
+- [ ] Try an invalid place and confirm the app shows a helpful error rather than crashing.
+- [ ] Confirm an unavailable FloodNet response leaves the route visible and shows a warning.
+- [ ] Read the privacy, source, and limitations notices.
+- [ ] Check the layout at desktop and phone widths.
+- [ ] Confirm the GitHub Actions workflow passed for the exact commit being shared.
+
+Public service outages can prevent a successful live-route test; record that as a dependency limitation rather than implying the app passed.
 
 ## Local validation
+
 Windows PowerShell:
+
 ```powershell
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
@@ -29,6 +49,7 @@ py -3.12 -m venv .venv
 ```
 
 macOS/Linux:
+
 ```bash
 python3.12 -m venv .venv
 .venv/bin/python -m pip install --upgrade pip
@@ -38,12 +59,8 @@ python3.12 -m venv .venv
 .venv/bin/python -m streamlit run app.py
 ```
 
-## Public service dependencies
-The app relies on OpenStreetMap Nominatim for geocoding, a community OpenStreetMap-based pedestrian routing service, and NYC Open Data/FloodNet for historical sensor evidence. No uptime guarantee is made for these services. Keep timeouts, attribution, error messages, and limitations in place; do not represent historical sensor data as live flood detection.
+## Public service and safety notes
 
-## Before sharing
-- Run the automated tests locally and confirm GitHub Actions passes.
-- Perform the README release smoke test against the deployed URL.
-- Confirm that the public URL opens in a signed-out/private browser.
-- Review the [data source registry](DATA_SOURCES.md) and [security review](SECURITY_REVIEW.md).
-- Do not add credentials, personal addresses, or private information to the repository.
+The app depends on OpenStreetMap Nominatim, a community-operated OpenStreetMap-based routing service, and NYC Open Data/FloodNet. They can be incomplete, rate-limited, or unavailable. Place text is sent to the geocoder and route coordinates to the router; providers may log requests. Do not enter sensitive personal information.
+
+RainRoute is an educational civic evidence tool, not an emergency service, real-time flood detector, safety-certified navigation system, or accessibility guarantee. Do not use it to decide whether a route is safe.
