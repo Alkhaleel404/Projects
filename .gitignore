@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.streamlit/secrets.toml
+.env
+.env.*
+!.env.example
+.coverage
+*.log
+*.pkl
+RainRoute_NYC.zip
+.DS_Store
+Thumbs.db
+build/
+dist/
+htmlcov/
