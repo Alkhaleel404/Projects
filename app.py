@@ -12,11 +12,12 @@ import folium
 import streamlit as st
 from streamlit_folium import st_folium
 
-from flood_data import DataSourceError, fetch_floodnet_events, parse_source_timestamp
+from coverage_analysis import sample_monitoring_gaps
+from flood_data import DataSourceError, fetch_floodnet_events, fetch_floodnet_sensor_locations, parse_source_timestamp
 
 st.set_page_config(
-    page_title="RainRoute NYC · Flood-aware route context",
-    page_icon="🌧️",
+    page_title="FloodLens NYC · Flood monitoring evidence gaps",
+    page_icon="🔎",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -30,7 +31,7 @@ html, body, [class*="css"] { font-family:Arial,Helvetica,sans-serif; color:var(-
 h1,h2,h3 { font-family:Arial,Helvetica,sans-serif; letter-spacing:-.035em; color:var(--ink); }
 h2 { margin-top:.4rem; }
 .hero { padding:1.6rem 1.9rem; border:1px solid #1f3e46; border-radius:8px; background:#122c34; color:#fff; margin-bottom:1rem; position:relative; overflow:hidden; }
-.hero:after { content:"RR / FIELD SYSTEM 01"; position:absolute; right:1.5rem; bottom:1.1rem; font:500 .7rem 'Courier New',monospace; letter-spacing:.1em; color:#86b8bc; }
+.hero:after { content:"FL / EVIDENCE SYSTEM 01"; position:absolute; right:1.5rem; bottom:1.1rem; font:500 .7rem 'Courier New',monospace; letter-spacing:.1em; color:#86b8bc; }
 .hero h1 { color:white; font-size:clamp(2.1rem,4vw,3.25rem); line-height:1.02; margin:.55rem 0 .7rem; max-width:900px; }
 .hero p { color:#d1e0e2; font-size:1rem; max-width:850px; line-height:1.6; margin-bottom:.25rem; }
 .kicker { font:500 .72rem 'Courier New',monospace; text-transform:uppercase; letter-spacing:.14em; color:#81ded0; }
@@ -52,9 +53,9 @@ code { font-family:'Courier New',monospace; }
 
 st.markdown("""
 <div class="hero">
-  <div class="kicker">Queens, New York · Civic evidence lab</div>
-  <h1>Before you choose a route,<br>inspect the evidence.</h1>
-  <p>RainRoute investigates the gap between a mapped walking route and what public flood records can actually tell us. Compare route geometry, nearby historical sensor events, and the limits of the available data.</p>
+  <div class="kicker">Queens, New York · Urban flood evidence lab</div>
+  <h1>Where are we missing<br>the evidence?</h1>
+  <p>FloodLens maps gaps in public flood-monitoring coverage. It measures how far sampled locations are from listed FloodNet sensors, then lets you inspect historical observations and route-level context without turning missing data into a false safety score.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -62,7 +63,69 @@ st.markdown("""
 <div class="notice"><strong>Important:</strong> This is an experimental research tool, not an emergency or safety-certified navigation service. FloodNet records below are historical, quality-reviewed sensor events—not a live flood-status feed. A route with no nearby records is not necessarily dry or safe. Follow official alerts and local instructions.</div>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="section-tag">01 / Start an investigation</div>', unsafe_allow_html=True)
+
+st.markdown('<div class="section-tag">01 / Monitoring coverage investigation</div>', unsafe_allow_html=True)
+st.markdown("### Where is the sensor evidence thin?")
+st.write("This analysis uses the published Queens FloodNet sensor inventory, including listed sensors that may have no event in the app's limited historical-event query. It samples a grid inside the inventory's coordinate envelope and measures distance to the nearest listed sensor.")
+st.caption("A monitoring gap means less direct sensor coverage—not higher flood risk. The grid envelope is not a Queens boundary and may include water or land uses; sample percentages are not a borough-wide area estimate.")
+@st.cache_data(ttl=3600, show_spinner=False)
+def floodnet_sensor_inventory() -> list[dict[str, Any]]:
+    return fetch_floodnet_sensor_locations()
+
+try:
+    with st.spinner("Loading the Queens FloodNet sensor inventory and sampling coverage…"):
+        sensor_inventory = floodnet_sensor_inventory()
+        coverage = sample_monitoring_gaps(sensor_inventory)
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Listed Queens sensors", coverage["sensor_count"])
+    m2.metric("Sample points over 2 km away", f'{coverage["over_2km_count"] / coverage["sample_count"]:.0%}')
+    m3.metric("Median nearest-sensor distance", f'{coverage["median_distance_m"]:,} m')
+    m4.metric("Farthest sample from a sensor", f'{max(point["distance_m"] for point in coverage["points"]):,} m')
+    coverage_map = folium.Map(
+        location=[(coverage["envelope"][0] + coverage["envelope"][2]) / 2,
+                  (coverage["envelope"][1] + coverage["envelope"][3]) / 2],
+        zoom_start=12, tiles="OpenStreetMap", control_scale=True,
+    )
+    bands = {"Within 1 km": "#16866b", "1–2 km": "#e0a12d", "Over 2 km": "#b64235"}
+    for point in coverage["points"]:
+        folium.CircleMarker(
+            [point["lat"], point["lon"]], radius=3, weight=0,
+            fill=True, fill_color=bands[point["band"]], fill_opacity=0.68,
+            tooltip=f'{point["band"]} from nearest listed sensor · {point["distance_m"]:,} m',
+        ).add_to(coverage_map)
+    for sensor in sensor_inventory:
+        folium.CircleMarker(
+            [sensor["lat"], sensor["lon"]], radius=5, color="#123c52",
+            fill=True, fill_color="#ffffff", fill_opacity=1,
+            tooltip=f'Listed FloodNet sensor: {sensor["name"]}',
+        ).add_to(coverage_map)
+    legend = """
+    <div style="position:fixed;bottom:24px;left:24px;z-index:9999;background:white;padding:10px 12px;border:1px solid #ccd6da;border-radius:5px;font-size:12px">
+    <b>Distance to listed sensor</b><br>
+    <span style="color:#16866b">●</span> Within 1 km<br>
+    <span style="color:#e0a12d">●</span> 1–2 km<br>
+    <span style="color:#b64235">●</span> Over 2 km<br>
+    <span style="color:#123c52">○</span> Listed sensor location
+    </div>
+    """
+    coverage_map.get_root().html.add_child(folium.Element(legend))
+    st_folium(coverage_map, use_container_width=True, height=520, returned_objects=[])
+    st.markdown("#### What the coverage calculation does")
+    st.write("For each grid sample, FloodLens calculates great-circle distance to the nearest listed Queens sensor. Samples more than 2 km away are flagged for investigation. This is a transparent proximity screen, not a scientifically validated threshold for flood monitoring adequacy.")
+    with st.expander("Inspect the most distant sample locations"):
+        farthest = sorted(coverage["points"], key=lambda point: point["distance_m"], reverse=True)[:10]
+        st.dataframe([{
+            "Latitude": round(point["lat"], 5),
+            "Longitude": round(point["lon"], 5),
+            "Nearest listed sensor": point["nearest_sensor"],
+            "Distance (m)": point["distance_m"],
+            "Coverage band": point["band"],
+        } for point in farthest], use_container_width=True, hide_index=True)
+except (DataSourceError, ValueError) as exc:
+    st.warning(f"Monitoring coverage analysis is temporarily unavailable: {exc}")
+    st.caption("The route investigation can still be used when the sensor inventory service is unavailable.")
+
+st.markdown('<div class="section-tag">02 / Route investigation</div>', unsafe_allow_html=True)
 with st.container(border=True):
     st.markdown("### Define your journey")
     st.caption("Enter two public Queens locations. RainRoute will map walking alternatives and inspect nearby historical sensor evidence. Your entries are not stored as trip history.")
@@ -85,7 +148,7 @@ def _json_request(url: str, *, timeout: float = 15.0) -> Any:
     if parsed.scheme != "https" or parsed.hostname not in ALLOWED_HOSTS:
         raise DataSourceError("A request was blocked because its destination was not an approved public-data service.")
     request = Request(url, headers={
-        "User-Agent": "RainRouteNYC/2.0 (student civic technology project)",
+        "User-Agent": "FloodLensNYC/1.0 (student civic technology project)",
         "Accept": "application/json",
     })
     try:
@@ -239,7 +302,7 @@ result = st.session_state.get("live_route_result")
 if result:
     origin, destination, routes = result["origin"], result["destination"], result["routes"]
     st.write("")
-    st.markdown('<div class="section-tag">02 / Route analysis</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-tag">03 / Route analysis</div>', unsafe_allow_html=True)
     st.markdown("### Walking-route alternatives")
     st.caption(f"From {origin['label']} to {destination['label']}. Routes use OpenStreetMap pedestrian-network data; coverage and accessibility tags may be incomplete.")
     options = [f"Route {i+1} · {r['distance_m']/1000:.2f} km · about {max(1, round(r['duration_s']/60))} min" for i, r in enumerate(routes)]
@@ -257,12 +320,12 @@ if result:
         nearby = event_rows_near_route(selected_route, events_payload)
         left, right = st.columns([1.3, .9], gap="large")
         with left:
-            st.markdown('<div class="section-tag">03 / Geographic evidence</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-tag">04 / Geographic evidence</div>', unsafe_allow_html=True)
             st.markdown("#### Route and sensor locations")
             st_folium(_route_map(origin, destination, routes, selected_index, nearby), use_container_width=True, height=560, returned_objects=[])
             st.caption("Map © OpenStreetMap contributors. Walking route calculated by the FOSS GIS routing service. Historical sensor points are shown only when within 300 m of the selected route.")
         with right:
-            st.markdown('<div class="section-tag">04 / Historical observations</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-tag">05 / Historical observations</div>', unsafe_allow_html=True)
             st.markdown("#### Nearby FloodNet records")
             st.metric("Historical records within 300 m", str(len(nearby)))
             if nearby:
@@ -276,7 +339,7 @@ if result:
             else:
                 st.info("No returned FloodNet sensor events were found within 300 m of this route. This does not mean the route is dry: sensor coverage is sparse and the dataset is historical.")
             st.caption(f"FloodNet data retrieved: {events_payload.get('retrieved_at', 'timestamp unavailable')}")
-        st.markdown('<div class="section-tag">05 / Compare</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-tag">06 / Compare</div>', unsafe_allow_html=True)
         st.markdown("#### What differs between routes?")
         comparison = []
         for idx, route in enumerate(routes):
