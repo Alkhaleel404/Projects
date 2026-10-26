@@ -132,7 +132,7 @@ def _render_start_here() -> None:
         st.button(
             "Explore route comparison  →",
             type="primary",
-            width="stretch",
+            use_container_width=True,
             on_click=_navigate_to_page,
             args=("Route Explorer",),
         )
@@ -149,17 +149,17 @@ def _render_start_here() -> None:
         with st.container(border=True):
             st.markdown("### Sample reports")
             st.write("Filter fictional reports by type, age, and route segment. Explore why unverified reports are not confirmed conditions.")
-            st.button("Explore reports", width="stretch", on_click=_navigate_to_page, args=("Flood Reports",))
+            st.button("Explore reports", use_container_width=True, on_click=_navigate_to_page, args=("Flood Reports",))
     with evidence_col:
         with st.container(border=True):
             st.markdown("### Public flood context")
             st.write("Inspect available FloodNet events, FEMA modeled hazard zones, and National Weather Service information separately.")
-            st.button("Open FloodLens", width="stretch", on_click=_navigate_to_page, args=("FloodLens",))
+            st.button("Open FloodLens", use_container_width=True, on_click=_navigate_to_page, args=("FloodLens",))
     with prep_col:
         with st.container(border=True):
             st.markdown("### Preparedness")
             st.write("Build a practical checklist for preparing for heavy rain and flooding, without collecting personal location data.")
-            st.button("Open checklist", width="stretch", on_click=_navigate_to_page, args=("Preparedness",))
+            st.button("Open checklist", use_container_width=True, on_click=_navigate_to_page, args=("Preparedness",))
     st.divider()
     st.markdown('<div class="section-kicker">Designed around uncertainty</div>', unsafe_allow_html=True)
     st.subheader("What is real—and what is simulated?")
@@ -307,10 +307,10 @@ def _render_route_explorer() -> None:
         st.write("")
         st.button(
             "Switch endpoints",
-            width="stretch",
+            use_container_width=True,
             on_click=_swap_route_endpoints,
         )
-        st.button("Reset route", width="stretch", on_click=_reset_route)
+        st.button("Reset route", use_container_width=True, on_click=_reset_route)
 
     try:
         reports = demo_reports(scenario=scenario)
