@@ -1,7 +1,5 @@
 # FloodLens NYC
 
-**Investigating where public urban-flood monitoring leaves gaps in the evidence.**
-
 Flooding is a street-level problem, but the evidence used to understand it is uneven. FloodLens is a Queens-focused civic-data prototype that explores a simple question:
 
 > **Where are we missing the evidence needed to understand urban flooding?**
