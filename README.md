@@ -1,115 +1,147 @@
 # FloodLens NYC
 
-Flooding is a street-level problem, but the evidence used to understand it is uneven. FloodLens is a Queens-focused civic-data prototype that explores a simple question:
+**FloodLens NYC is a Queens-focused civic-data prototype for exploring gaps in public flood-monitoring coverage.** It maps listed FloodNet sensor locations, estimates the distance from sample points to the nearest listed sensor, and lets users inspect historical sensor events and optional walking-route context.
 
-> **Where are we missing the evidence needed to understand urban flooding?**
+> **Important:** FloodLens is an educational research tool, not a flood forecast, emergency service, or safety-certified navigation app. A nearby sensor or a lack of historical events does not tell you whether a street is safe.
 
-The app maps listed NYC FloodNet sensor locations, estimates how far sampled points are from the nearest listed sensor, and lets users explore that coverage alongside available historical sensor events. It also includes an optional walking-route comparison to help investigate locations in context.
+## Try the website
 
-FloodLens is a research and learning tool—not a flood forecast, navigation authority, or emergency service.
+**Hosted app:** *Add your public Streamlit Community Cloud URL here after deployment and testing.*
 
-## Explore the app
+The GitHub repository is the source code; it is not itself the running website. If no hosted-app link is shown above, follow the deployment instructions below or run the app on your computer.
 
-- **Monitoring coverage:** inspect the listed Queens sensor inventory and sampled points grouped by distance to the nearest sensor.
-- **Coverage gaps:** see the most distant sample points and compare the distribution across three exploratory distance bands.
-- **Historical context:** review event records returned by the public data source.
-- **Route investigation:** compare public walking-route alternatives and nearby historical sensor context.
+## Run FloodLens on your computer
 
-## How the coverage analysis works
+You will need:
+- A computer running Windows, macOS, or Linux
+- Git
+- **Python 3.12** (recommended)
+- An internet connection, because the app retrieves public data and uses external mapping, geocoding, and routing services
 
-1. Retrieve the publicly listed FloodNet sensor locations for Queens.
-2. Generate a regular sample grid within the minimum-to-maximum latitude and longitude of the returned sensor coordinates.
-3. Calculate the straight-line, great-circle distance from each sample point to its nearest listed sensor.
-4. Group the sample points into distance bands: **within 1 km**, **1–2 km**, and **over 2 km**.
-5. Display the results on a map and identify the farthest sampled points for further investigation.
+### 1. Download the project
 
-These steps measure **proximity to listed sensors**, not flood danger. The bands are exploratory thresholds, not validated standards for adequate monitoring.
+Open a terminal (PowerShell on Windows, Terminal on macOS/Linux) and run:
 
-## Read the map carefully
+```bash
+git clone https://github.com/Alkhaleel404/Projects.git
+cd Projects
+```
 
-| Map result | What you can conclude | What you cannot conclude |
-|---|---|---|
-| Listed sensor marker | A sensor appears in the public inventory | That it is online now or represents every nearby street |
-| Sample point within 1 km | A listed sensor is relatively close in straight-line distance | That the area is adequately monitored or safe |
-| Sample point over 2 km away | No listed sensor is within 2 km in straight-line distance | That the area is at higher flood risk |
-| Percentage of sample points in a band | The share of generated grid points in that distance band | The share of Queens land area or population affected |
-| Historical sensor event | A past measurement is present in the returned records | Current street conditions or a complete record of past flooding |
+If you downloaded the repository as a ZIP instead, extract it and open a terminal in the extracted **Projects** folder. The folder should contain `app.py` and `requirements.txt`.
 
-### Important limitations
+### 2. Create a virtual environment
 
-- The grid uses the **coordinate envelope of the returned sensor inventory**, not an official Queens boundary. It can include water and non-residential areas.
-- Straight-line distance does not account for drainage, elevation, flood pathways, barriers, sensor performance, or where people live.
-- The historical-event request is limited to the **100 latest returned rows**, so it is not a complete archive.
-- A missing event near a location does not mean flooding has never occurred there.
-- The app does not currently calculate a flood-risk score or incorporate FEMA hazard layers.
-- Public geocoding and routing services can be unavailable or rate-limited, and their service policies may apply to submitted queries.
-
-## Data and attribution
-
-FloodLens uses public data and open mapping services:
-
-- [NYC Open Data — FloodNet street-flooding events](https://data.cityofnewyork.us/Environment/FloodNet-Street-Flooding-Events-Measured-by-FloodN/aq7i-eu5q)
-- [NYC Open Data](https://data.cityofnewyork.us/) — public data portal and sensor metadata
-- [FloodNet NYC](https://www.floodnet.nyc/)
-- [OpenStreetMap](https://www.openstreetmap.org/copyright) — map and pedestrian-network data
-- [Nominatim usage policy](https://operations.osmfoundation.org/policies/nominatim/) — place-name geocoding
-- [FOSS GIS routing service](https://routing.openstreetmap.de/about.html) — route geometry and estimated travel time
-
-More detail: [DATA_SOURCES.md](DATA_SOURCES.md) · [DEPLOYMENT.md](DEPLOYMENT.md) · [SECURITY_REVIEW.md](SECURITY_REVIEW.md)
-
-## Run locally
-
-Python 3.12 is recommended. Internet access is needed to retrieve public datasets and routing/geocoding responses.
-
-**Windows PowerShell**
+**Windows PowerShell:**
 
 ```powershell
 py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install --upgrade pip
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.\.venv\Scripts\python.exe -m compileall -q .
-.\.venv\Scripts\python.exe -m unittest discover -s tests -v
-.\.venv\Scripts\python.exe -m streamlit run app.py
 ```
 
-**macOS / Linux**
+**macOS / Linux:**
 
 ```bash
 python3.12 -m venv .venv
+```
+
+If the command says Python 3.12 is not installed, install Python 3.12 from [python.org](https://www.python.org/downloads/) and try again. On Windows, make sure the Python launcher (`py`) is installed. A virtual environment keeps this project's packages separate from other Python projects.
+
+### 3. Install the dependencies
+
+Run these commands from inside the **Projects** folder.
+
+**Windows PowerShell:**
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
+
+**macOS / Linux:**
+
+```bash
 .venv/bin/python -m pip install --upgrade pip
 .venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python -m compileall -q .
-.venv/bin/python -m unittest discover -s tests -v
+```
+
+### 4. Start the website
+
+**Windows PowerShell:**
+
+```powershell
+.\.venv\Scripts\python.exe -m streamlit run app.py
+```
+
+**macOS / Linux:**
+
+```bash
 .venv/bin/python -m streamlit run app.py
 ```
 
-## Deploy with Streamlit Community Cloud
+Streamlit should open your browser automatically. If it does not, copy the **Local URL** shown in the terminal (usually [http://localhost:8501](http://localhost:8501)) into your browser. Keep the terminal open while using the app. To stop the local server, press `Ctrl+C` in that terminal.
 
-1. Open [Streamlit Community Cloud](https://share.streamlit.io/) and sign in with GitHub.
-2. Create an app from repository `Alkhaleel404/Projects`.
-3. Select branch `main` and entrypoint `app.py`.
-4. Choose Python 3.12 if prompted, then deploy.
-5. Open the published app and complete the smoke checks below.
+### Common problems
 
-The GitHub repository and a hosted app are separate things: deployment is not confirmed until hosting finishes and the public URL is tested. The current version does not require app secrets.
+- **`requirements.txt` not found:** You are probably in the wrong directory. Run `cd Projects` (or open the extracted project folder) and check that `app.py` and `requirements.txt` are there.
+- **`No module named streamlit` (or another package):** Install dependencies again from the project folder using the command in Step 3. Make sure you use the same virtual-environment Python for installation and startup.
+- **Python 3.12 not found:** Install Python 3.12 from [python.org](https://www.python.org/downloads/), then reopen your terminal.
+- **The page opens but data or routes do not load:** The app depends on public data and third-party mapping services. Check your internet connection and try again later; those services may be unavailable or rate-limited.
+- **Port 8501 is already in use:** Streamlit may offer another local URL in the terminal. Open the URL it prints.
 
-## Release checklist
+## Host a public website with Streamlit Community Cloud
 
-- [ ] The app opens without a traceback.
-- [ ] Sensor inventory loads, or the app shows a clear unavailable state.
-- [ ] Sensor markers and coverage sample points render on the map.
-- [ ] Distance bands and farthest-point results are plausible.
-- [ ] Historical events load, or a clear empty/unavailable state appears.
-- [ ] Route comparison works when public routing services are available.
-- [ ] Limitations and privacy notices are visible on desktop and mobile.
-- [ ] GitHub Actions passes for the commit being deployed.
+To let people use FloodLens through a link without installing Python:
 
-Automated tests do not confirm third-party uptime, correct rendering in every browser, accessibility compliance, or suitability for emergency use.
+1. Push the project to GitHub.
+2. Open [Streamlit Community Cloud](https://share.streamlit.io/) and sign in with GitHub.
+3. Choose **Create app** (or the equivalent deployment option).
+4. Select repository **`Alkhaleel404/Projects`**, branch **`main`**, and main file **`app.py`**.
+5. Choose Python **3.12** in the app's advanced settings if the option is shown. No app secrets are currently required.
+6. Deploy and wait for the build to finish.
+7. Open the generated `.streamlit.app` URL in a private/incognito browser window to check that it is publicly accessible.
+8. Add the verified public URL to the **Try the website** section above.
 
-## Privacy and security
+**Note:** Do not invent or share a deployment URL until Streamlit has actually created the app and you have tested it. A GitHub repository link is not the same as a hosted website.
 
-The current prototype does not require an account, app database, device geolocation, saved trip history, or user-submitted public reports. Place names entered for route investigation may be sent to external geocoding and routing providers; consult their policies before entering sensitive information. See [SECURITY_REVIEW.md](SECURITY_REVIEW.md).
+## What the app does
 
-## Next research direction
+- **Monitoring coverage:** Maps the listed Queens FloodNet sensor inventory and sample points grouped by distance to the nearest listed sensor.
+- **Coverage gaps:** Highlights sample points farther from listed sensors.
+- **Historical context:** Displays event records returned by the public data source.
+- **Route investigation:** Lets users compare walking-route alternatives and nearby historical sensor context when the external services are available.
 
-A stronger follow-up study would compare the sensor-proximity analysis with a documented Queens land boundary and relevant flood-hazard or vulnerability datasets, then test whether findings hold under different grid spacing and distance thresholds. Any conclusions should be validated against the limitations of each source before being treated as evidence of monitoring need.
+## How to interpret the results
+
+The analysis generates sample points within the latitude/longitude envelope of the returned sensor locations, calculates straight-line distance to the nearest listed sensor, and groups sample points into exploratory bands: **within 1 km**, **1–2 km**, and **over 2 km**.
+
+These are measures of proximity to listed sensors—not flood risk, safety, or monitoring adequacy. The coordinate envelope is not an official Queens boundary and may include water or non-residential areas. The historical-event query is limited and is not a complete archive or a live flood-status feed. Straight-line distance does not account for elevation, drainage, flood pathways, or barriers.
+
+## Data sources and attribution
+
+- [NYC Open Data — FloodNet street-flooding events](https://data.cityofnewyork.us/Environment/FloodNet-Street-Flooding-Events-Measured-by-FloodN/aq7i-eu5q)
+- [NYC Open Data](https://data.cityofnewyork.us/)
+- [FloodNet NYC](https://www.floodnet.nyc/)
+- [OpenStreetMap copyright and attribution](https://www.openstreetmap.org/copyright)
+- [Nominatim usage policy](https://operations.osmfoundation.org/policies/nominatim/)
+- [OpenStreetMap routing service information](https://routing.openstreetmap.de/about.html)
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for deployment notes and [SECURITY_REVIEW.md](SECURITY_REVIEW.md) for privacy and security considerations.
+
+## Privacy
+
+The current prototype does not require an account, database, device geolocation, or saved trip history. Place names entered for route investigation may be sent to external geocoding services, and route requests may be sent to routing services. These providers may process or log requests. Do not enter sensitive personal information.
+
+## Project structure
+
+- `app.py` — Streamlit app entry point and user interface
+- `requirements.txt` — Python package dependencies
+- `coverage_analysis.py` — sensor-proximity sampling and analysis
+- `flood_data.py` — retrieval and parsing of FloodNet data
+- `data_sources.py` — public-data source helpers
+- `routing.py` — route lookup and related context
+- `preparedness.py` — preparedness-related functionality
+- `DEPLOYMENT.md` — hosting and validation notes
+- `SECURITY_REVIEW.md` — privacy and security review
+
+## License
+
+Check the repository for a license before reusing or redistributing this project.
