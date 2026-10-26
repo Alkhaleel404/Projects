@@ -1,62 +1,68 @@
 # FloodLens NYC
 
-**FloodLens NYC is a Queens-focused civic-data prototype for exploring gaps in public flood-monitoring coverage.** It maps listed FloodNet sensor locations, estimates the distance from sample points to the nearest listed sensor, and lets users inspect historical sensor events and optional walking-route context.
+**Explore gaps in public flood-monitoring coverage and investigate walking routes in Queens, NYC.**
 
-> **Important:** FloodLens is an educational research tool, not a flood forecast, emergency service, or safety-certified navigation app. A nearby sensor or a lack of historical events does not tell you whether a street is safe.
+FloodLens NYC is a student-built civic technology prototype. It maps listed FloodNet sensor locations, estimates how far sample points are from the nearest listed sensor, and lets users compare walking-route alternatives with nearby historical FloodNet observations.
+
+> **Important:** FloodLens is a research and educational tool—not a flood forecast, emergency service, or safety-certified navigation app. Historical sensor events and the absence of nearby records cannot tell you whether a street or route is safe right now. Follow official alerts and local emergency instructions.
 
 ## Try the website
 
-**Hosted app:** *Add your public Streamlit Community Cloud URL here after deployment and testing.*
+**Live website:** Not listed yet. A GitHub repository is the source code, not the running website. To publish a public website, follow [Deploy on Streamlit Community Cloud](#deploy-on-streamlit-community-cloud) below and add the verified app URL here.
 
-The GitHub repository is the source code; it is not itself the running website. If no hosted-app link is shown above, follow the deployment instructions below or run the app on your computer.
+**Source code:** [Alkhaleel404/Projects on GitHub](https://github.com/Alkhaleel404/Projects)
 
-## Run FloodLens on your computer
+## Run it on your computer
 
-You will need:
-- A computer running Windows, macOS, or Linux
-- Git
-- **Python 3.12** (recommended)
-- An internet connection, because the app retrieves public data and uses external mapping, geocoding, and routing services
+You can run the app locally on Windows, macOS, or Linux. You will need:
 
-### 1. Download the project
+- Python 3.12 (recommended)
+- Git, or the ability to download this repository as a ZIP
+- An internet connection to retrieve public data and use mapping services
 
-Open a terminal (PowerShell on Windows, Terminal on macOS/Linux) and run:
+### 1. Get the project
+
+Open PowerShell on Windows or Terminal on macOS/Linux. Run:
 
 ```bash
 git clone https://github.com/Alkhaleel404/Projects.git
 cd Projects
 ```
 
-If you downloaded the repository as a ZIP instead, extract it and open a terminal in the extracted **Projects** folder. The folder should contain `app.py` and `requirements.txt`.
+Alternatively, open the [repository page](https://github.com/Alkhaleel404/Projects), select **Code → Download ZIP**, extract the ZIP, and open a terminal **inside the extracted `Projects` folder**.
+
+Before continuing, make sure this folder contains `app.py` and `requirements.txt`. The commands below will not work from your general home folder.
 
 ### 2. Create a virtual environment
 
-**Windows PowerShell:**
+A virtual environment keeps this app's Python packages separate from other projects.
+
+**Windows PowerShell**
 
 ```powershell
 py -3.12 -m venv .venv
 ```
 
-**macOS / Linux:**
+**macOS / Linux**
 
 ```bash
 python3.12 -m venv .venv
 ```
 
-If the command says Python 3.12 is not installed, install Python 3.12 from [python.org](https://www.python.org/downloads/) and try again. On Windows, make sure the Python launcher (`py`) is installed. A virtual environment keeps this project's packages separate from other Python projects.
+If Python 3.12 is not installed, install it from [python.org](https://www.python.org/downloads/), then reopen your terminal and repeat this step. If you already use another compatible Python version, you can try it, but the project is documented and recommended for Python 3.12.
 
-### 3. Install the dependencies
+### 3. Install the required packages
 
-Run these commands from inside the **Projects** folder.
+Run the commands for your operating system **from the same `Projects` folder**.
 
-**Windows PowerShell:**
+**Windows PowerShell**
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-**macOS / Linux:**
+**macOS / Linux**
 
 ```bash
 .venv/bin/python -m pip install --upgrade pip
@@ -65,83 +71,108 @@ Run these commands from inside the **Projects** folder.
 
 ### 4. Start the website
 
-**Windows PowerShell:**
+**Windows PowerShell**
 
 ```powershell
 .\.venv\Scripts\python.exe -m streamlit run app.py
 ```
 
-**macOS / Linux:**
+**macOS / Linux**
 
 ```bash
 .venv/bin/python -m streamlit run app.py
 ```
 
-Streamlit should open your browser automatically. If it does not, copy the **Local URL** shown in the terminal (usually [http://localhost:8501](http://localhost:8501)) into your browser. Keep the terminal open while using the app. To stop the local server, press `Ctrl+C` in that terminal.
+Streamlit will print a local address, usually **http://localhost:8501**, and may open it in your browser automatically. If it does not, copy that address into your browser. Keep the terminal open while using the app. To stop it, press **Ctrl+C** in the terminal.
 
-### Common problems
+### Troubleshooting
 
-- **`requirements.txt` not found:** You are probably in the wrong directory. Run `cd Projects` (or open the extracted project folder) and check that `app.py` and `requirements.txt` are there.
-- **`No module named streamlit` (or another package):** Install dependencies again from the project folder using the command in Step 3. Make sure you use the same virtual-environment Python for installation and startup.
-- **Python 3.12 not found:** Install Python 3.12 from [python.org](https://www.python.org/downloads/), then reopen your terminal.
-- **The page opens but data or routes do not load:** The app depends on public data and third-party mapping services. Check your internet connection and try again later; those services may be unavailable or rate-limited.
-- **Port 8501 is already in use:** Streamlit may offer another local URL in the terminal. Open the URL it prints.
+- **`requirements.txt` not found:** You are not in the project folder. Use `cd Projects`, or open the extracted folder that contains `app.py` and `requirements.txt`.
+- **`No module named streamlit`:** The dependencies were not installed in this environment. Repeat Step 3, then start the app using the same virtual-environment Python shown in Step 4.
+- **Python 3.12 or `py` not found:** Install Python 3.12 from [python.org](https://www.python.org/downloads/). On Windows, make sure the Python launcher is included.
+- **The app opens but data or routes fail to load:** FloodLens uses external public data and community-operated mapping services. Check your internet connection and try again later; a service may be unavailable or rate-limited.
+- **Port 8501 is busy:** Use the local URL Streamlit prints in the terminal; it may offer a different port.
 
-## Host a public website with Streamlit Community Cloud
+## Deploy on Streamlit Community Cloud
 
-To let people use FloodLens through a link without installing Python:
+This is the route for making the app available to other people through a public website link, without asking them to install Python.
 
-1. Push the project to GitHub.
+1. Make sure the code you want to publish is pushed to the `main` branch of this GitHub repository.
 2. Open [Streamlit Community Cloud](https://share.streamlit.io/) and sign in with GitHub.
-3. Choose **Create app** (or the equivalent deployment option).
-4. Select repository **`Alkhaleel404/Projects`**, branch **`main`**, and main file **`app.py`**.
-5. Choose Python **3.12** in the app's advanced settings if the option is shown. No app secrets are currently required.
-6. Deploy and wait for the build to finish.
-7. Open the generated `.streamlit.app` URL in a private/incognito browser window to check that it is publicly accessible.
-8. Add the verified public URL to the **Try the website** section above.
+3. Select **Create app**.
+4. Choose repository `Alkhaleel404/Projects`, branch `main`, and main file path `app.py`.
+5. In advanced settings, select Python 3.12 if a Python-version option is available. The current app does not require any secrets or API keys.
+6. Deploy and wait for Streamlit to finish building the app.
+7. Open the generated `.streamlit.app` link. Test it in a private/incognito browser window and check that the app loads.
+8. After you have verified that the public link works, replace the “Live website” note near the top of this README with that exact URL.
 
-**Note:** Do not invent or share a deployment URL until Streamlit has actually created the app and you have tested it. A GitHub repository link is not the same as a hosted website.
+**Important:** A successful GitHub push does not deploy the app by itself. Do not list a live website URL until Streamlit has generated it and you have tested it.
 
-## What the app does
+## What FloodLens does
 
-- **Monitoring coverage:** Maps the listed Queens FloodNet sensor inventory and sample points grouped by distance to the nearest listed sensor.
-- **Coverage gaps:** Highlights sample points farther from listed sensors.
-- **Historical context:** Displays event records returned by the public data source.
-- **Route investigation:** Lets users compare walking-route alternatives and nearby historical sensor context when the external services are available.
+- **Sensor coverage map:** Displays listed Queens FloodNet sensors and sample points grouped by distance to the nearest listed sensor.
+- **Coverage-gap investigation:** Highlights sample points that are more than 2 km from a listed sensor.
+- **Walking-route comparison:** Geocodes two Queens locations and retrieves up to three walking-route alternatives when the public routing service is available.
+- **Historical flood context:** Displays returned FloodNet sensor events within 300 metres of a selected route, when the data service is available.
+- **Transparent comparison:** Shows route distance, a routing-service time estimate, and the number of nearby historical records without turning those records into a safety score.
 
 ## How to interpret the results
 
-The analysis generates sample points within the latitude/longitude envelope of the returned sensor locations, calculates straight-line distance to the nearest listed sensor, and groups sample points into exploratory bands: **within 1 km**, **1–2 km**, and **over 2 km**.
+The coverage analysis samples a grid within the coordinate envelope of the listed sensor locations and measures straight-line distance to the nearest sensor. This envelope is **not an official Queens boundary** and may include water or non-residential areas. Distance bands are exploratory indicators of sensor proximity, not validated standards for adequate flood monitoring.
 
-These are measures of proximity to listed sensors—not flood risk, safety, or monitoring adequacy. The coordinate envelope is not an official Queens boundary and may include water or non-residential areas. The historical-event query is limited and is not a complete archive or a live flood-status feed. Straight-line distance does not account for elevation, drainage, flood pathways, or barriers.
+For route investigation, FloodLens uses OpenStreetMap-based walking routes and looks for returned historical sensor events within 300 metres of route geometry. The 300-metre distance is a display filter, not a validated flood-impact radius. The event query is limited and does not represent a complete archive or live flood status. Sensor measurements describe conditions at the sensor, not every nearby sidewalk.
+
+A route with no nearby historical events may still experience flooding. Route times may not reflect closures, weather, crossing conditions, mobility needs, or current street conditions. FloodLens does not certify that a route is safe or accessible.
 
 ## Data sources and attribution
 
 - [NYC Open Data — FloodNet street-flooding events](https://data.cityofnewyork.us/Environment/FloodNet-Street-Flooding-Events-Measured-by-FloodN/aq7i-eu5q)
-- [NYC Open Data](https://data.cityofnewyork.us/)
+- [NYC Open Data — FloodNet sensor deployment metadata](https://data.cityofnewyork.us/resource/kb2e-tjy3.json)
 - [FloodNet NYC](https://www.floodnet.nyc/)
-- [OpenStreetMap copyright and attribution](https://www.openstreetmap.org/copyright)
-- [Nominatim usage policy](https://operations.osmfoundation.org/policies/nominatim/)
-- [OpenStreetMap routing service information](https://routing.openstreetmap.de/about.html)
+- [OpenStreetMap contributors and copyright](https://www.openstreetmap.org/copyright)
+- [Nominatim geocoding service and usage policy](https://operations.osmfoundation.org/policies/nominatim/)
+- [OpenStreetMap-based routing service information](https://routing.openstreetmap.de/about.html)
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for deployment notes and [SECURITY_REVIEW.md](SECURITY_REVIEW.md) for privacy and security considerations.
+See [DATA_SOURCES.md](DATA_SOURCES.md) for source details, [DEPLOYMENT.md](DEPLOYMENT.md) for deployment checks, and [SECURITY_REVIEW.md](SECURITY_REVIEW.md) for privacy and security considerations.
 
 ## Privacy
 
-The current prototype does not require an account, database, device geolocation, or saved trip history. Place names entered for route investigation may be sent to external geocoding services, and route requests may be sent to routing services. These providers may process or log requests. Do not enter sensitive personal information.
+The app does not require an account, database, device geolocation, or saved trip history. Place names entered for route investigation are sent to OpenStreetMap Nominatim for geocoding, and route coordinates are sent to the public routing service. Those providers may process or log requests. Do not enter sensitive personal information.
 
 ## Project structure
 
-- `app.py` — Streamlit app entry point and user interface
-- `requirements.txt` — Python package dependencies
-- `coverage_analysis.py` — sensor-proximity sampling and analysis
-- `flood_data.py` — retrieval and parsing of FloodNet data
-- `data_sources.py` — public-data source helpers
-- `routing.py` — route lookup and related context
-- `preparedness.py` — preparedness-related functionality
-- `DEPLOYMENT.md` — hosting and validation notes
-- `SECURITY_REVIEW.md` — privacy and security review
+| File | Purpose |
+|---|---|
+| `app.py` | Streamlit app entry point and interface |
+| `requirements.txt` | Python package dependencies |
+| `coverage_analysis.py` | Sensor-proximity sampling and coverage analysis |
+| `flood_data.py` | Validated public-data retrieval and parsing |
+| `data_sources.py` | Public-data source helpers |
+| `routing.py` | Route-related helpers |
+| `preparedness.py` | Preparedness-related functionality |
+| `tests/` | Automated tests |
+| `DATA_SOURCES.md` | Data sources, methods, and limitations |
+| `DEPLOYMENT.md` | Deployment and release-check instructions |
+| `SECURITY_REVIEW.md` | Privacy and security review |
+
+## Run the tests
+
+After completing Steps 1–3 above, run the following from the project folder.
+
+**Windows PowerShell**
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+```
+
+**macOS / Linux**
+
+```bash
+.venv/bin/python -m unittest discover -s tests -v
+```
+
+Passing automated tests does not guarantee that external public-data, geocoding, or routing services are currently available.
 
 ## License
 
-Check the repository for a license before reusing or redistributing this project.
+No license is specified in this README. Check the repository for a license before reusing or redistributing the project.
