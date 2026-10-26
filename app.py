@@ -23,29 +23,39 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
-:root { --ink:#142d35; --muted:#617780; --teal:#087e8b; --line:#dce7e8; --paper:#f5f8f7; }
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+:root { --ink:#17252c; --muted:#62727b; --line:#d8e0e3; --paper:#f2f5f4; --teal:#087e8b; --amber:#b86a1d; }
 html, body, [class*="css"] { font-family:'DM Sans',sans-serif; color:var(--ink); }
-.block-container { max-width:1440px; padding-top:1.4rem; padding-bottom:3rem; }
-h1,h2,h3 { font-family:'Manrope',sans-serif; letter-spacing:-.04em; color:var(--ink); }
-.hero { padding:2.2rem 2.3rem; border-radius:24px; background:linear-gradient(120deg,#102f39 0%,#155663 64%,#287e82 100%); color:white; margin-bottom:1.25rem; }
-.hero h1 { color:white; font-size:clamp(2.2rem,4vw,3.5rem); line-height:1.04; margin:.45rem 0 .7rem; }
-.hero p { color:#d6e9e9; font-size:1.05rem; max-width:780px; line-height:1.65; }
-.kicker { font-size:.74rem; text-transform:uppercase; letter-spacing:.16em; font-weight:800; color:#8fe2d5; }
-.panel { border:1px solid var(--line); border-radius:18px; padding:1.1rem 1.25rem; background:white; }
-.notice { padding:1rem 1.1rem; border:1px solid #e9d5a7; border-radius:14px; background:#fff9e9; color:#684d17; }
+.stApp { background:var(--paper); }
+.block-container { max-width:1500px; padding-top:1.1rem; padding-bottom:3rem; }
+h1,h2,h3 { font-family:'Manrope',sans-serif; letter-spacing:-.035em; color:var(--ink); }
+h2 { margin-top:.4rem; }
+.hero { padding:1.6rem 1.9rem; border:1px solid #1f3e46; border-radius:8px; background:#122c34; color:#fff; margin-bottom:1rem; position:relative; overflow:hidden; }
+.hero:after { content:"RR / FIELD SYSTEM 01"; position:absolute; right:1.5rem; bottom:1.1rem; font:500 .7rem 'DM Mono',monospace; letter-spacing:.1em; color:#86b8bc; }
+.hero h1 { color:white; font-size:clamp(2.1rem,4vw,3.25rem); line-height:1.02; margin:.55rem 0 .7rem; max-width:900px; }
+.hero p { color:#d1e0e2; font-size:1rem; max-width:850px; line-height:1.6; margin-bottom:.25rem; }
+.kicker { font:500 .72rem 'DM Mono',monospace; text-transform:uppercase; letter-spacing:.14em; color:#81ded0; }
+.notice { padding:.9rem 1rem; border-left:4px solid #c48a34; border-radius:3px; background:#fff8e9; color:#654c24; }
+.section-tag { font:500 .7rem 'DM Mono',monospace; letter-spacing:.12em; text-transform:uppercase; color:#527078; }
+.panel { border:1px solid var(--line); border-radius:8px; padding:1rem 1.1rem; background:#fff; }
 .small-muted { color:var(--muted); font-size:.88rem; }
-[data-testid="stMetric"] { border:1px solid var(--line); border-radius:15px; padding:1rem; background:white; }
-div.stButton > button { border-radius:11px; min-height:2.8rem; font-weight:700; }
-@media(max-width:700px){.hero{padding:1.4rem;border-radius:18px}.block-container{padding-left:.8rem;padding-right:.8rem}}
+[data-testid="stMetric"] { border:1px solid var(--line); border-radius:6px; padding:.9rem 1rem; background:#fff; }
+[data-testid="stMetricLabel"] { font-size:.75rem; text-transform:uppercase; letter-spacing:.07em; }
+div.stButton > button { border-radius:5px; min-height:2.9rem; font-weight:700; border:1px solid #0f5961; }
+div.stButton > button[kind="primary"] { background:#087e8b; }
+div[data-testid="stVerticalBlockBorderWrapper"] { border-radius:7px; }
+div[data-testid="stDataFrame"] { border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+hr { border-color:var(--line); }
+code { font-family:'DM Mono',monospace; }
+@media(max-width:700px){.hero{padding:1.2rem;border-radius:6px}.hero:after{display:none}.block-container{padding-left:.7rem;padding-right:.7rem}}
 </style>
 """, unsafe_allow_html=True)
 
 st.markdown("""
 <div class="hero">
-  <div class="kicker">Queens · Civic technology</div>
-  <h1>Plan with the evidence.<br>Be honest about uncertainty.</h1>
-  <p>Compare real walking routes with nearby historical flood-sensor observations. RainRoute connects real street geometry to real geographic evidence—without pretending that old measurements prove today's sidewalk conditions.</p>
+  <div class="kicker">Queens, New York · Civic evidence lab</div>
+  <h1>Before you choose a route,<br>inspect the evidence.</h1>
+  <p>RainRoute investigates the gap between a mapped walking route and what public flood records can actually tell us. Compare route geometry, nearby historical sensor events, and the limits of the available data.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -53,16 +63,20 @@ st.markdown("""
 <div class="notice"><strong>Important:</strong> This is an experimental research tool, not an emergency or safety-certified navigation service. FloodNet records below are historical, quality-reviewed sensor events—not a live flood-status feed. A route with no nearby records is not necessarily dry or safe. Follow official alerts and local instructions.</div>
 """, unsafe_allow_html=True)
 
-st.write("")
+st.markdown('<div class="section-tag">01 / Start an investigation</div>', unsafe_allow_html=True)
 with st.container(border=True):
-    st.markdown("### Build a real walking route")
-    st.caption("Enter public place names or addresses. The app does not request your device location or save these inputs. The text you submit is sent to OpenStreetMap's geocoder, and the resulting coordinates are sent to a community-operated walking-routing service to calculate the route.")
-    c1, c2 = st.columns(2)
+    st.markdown("### Define your journey")
+    st.caption("Enter two public Queens locations. RainRoute will map walking alternatives and inspect nearby historical sensor evidence. Your entries are not stored as trip history.")
+    c1, c2, c3 = st.columns([1, 1, .7], gap="medium")
     with c1:
-        origin_text = st.text_input("Starting point", placeholder="e.g., Jamaica Center, Queens, NY", key="origin_input")
+        origin_text = st.text_input("ORIGIN", placeholder="Jamaica Center, Queens", key="origin_input")
     with c2:
-        destination_text = st.text_input("Destination", placeholder="e.g., Rufus King Park, Queens, NY", key="destination_input")
-    run_route = st.button("Find walking routes", type="primary", use_container_width=True)
+        destination_text = st.text_input("DESTINATION", placeholder="Rufus King Park, Queens", key="destination_input")
+    with c3:
+        st.write("")
+        st.write("")
+        run_route = st.button("Investigate routes  ↗", type="primary", use_container_width=True)
+    st.caption("Privacy note: place text is sent to OpenStreetMap Nominatim; route coordinates are sent to a public routing service. Providers may log requests.")
 
 ALLOWED_HOSTS = {"nominatim.openstreetmap.org", "routing.openstreetmap.de", "data.cityofnewyork.us"}
 
@@ -226,7 +240,8 @@ result = st.session_state.get("live_route_result")
 if result:
     origin, destination, routes = result["origin"], result["destination"], result["routes"]
     st.write("")
-    st.markdown("### Your walking route options")
+    st.markdown('<div class="section-tag">02 / Route analysis</div>', unsafe_allow_html=True)
+    st.markdown("### Walking-route alternatives")
     st.caption(f"From {origin['label']} to {destination['label']}. Routes use OpenStreetMap pedestrian-network data; coverage and accessibility tags may be incomplete.")
     options = [f"Route {i+1} · {r['distance_m']/1000:.2f} km · about {max(1, round(r['duration_s']/60))} min" for i, r in enumerate(routes)]
     selected_label = st.selectbox("Inspect a route", options, key="selected_live_route")
@@ -243,11 +258,13 @@ if result:
         nearby = event_rows_near_route(selected_route, events_payload)
         left, right = st.columns([1.3, .9], gap="large")
         with left:
-            st.markdown("#### Map and nearby evidence")
+            st.markdown('<div class="section-tag">03 / Geographic evidence</div>', unsafe_allow_html=True)
+            st.markdown("#### Route and sensor locations")
             st_folium(_route_map(origin, destination, routes, selected_index, nearby), use_container_width=True, height=560, returned_objects=[])
             st.caption("Map © OpenStreetMap contributors. Walking route calculated by the FOSS GIS routing service. Historical sensor points are shown only when within 300 m of the selected route.")
         with right:
-            st.markdown("#### Historical FloodNet events")
+            st.markdown('<div class="section-tag">04 / Historical observations</div>', unsafe_allow_html=True)
+            st.markdown("#### Nearby FloodNet records")
             st.metric("Events within 300 m", str(len(nearby)))
             if nearby:
                 for row in nearby:
@@ -260,7 +277,8 @@ if result:
             else:
                 st.info("No returned FloodNet sensor events were found within 300 m of this route. This does not mean the route is dry: sensor coverage is sparse and the dataset is historical.")
             st.caption(f"FloodNet data retrieved: {events_payload.get('retrieved_at', 'timestamp unavailable')}")
-        st.markdown("#### Compare the alternatives")
+        st.markdown('<div class="section-tag">05 / Compare</div>', unsafe_allow_html=True)
+        st.markdown("#### What differs between routes?")
         comparison = []
         for idx, route in enumerate(routes):
             matched = event_rows_near_route(route, events_payload)
@@ -278,7 +296,8 @@ if result:
         st.caption("The route and distance remain real; no flood-data conclusion is available when the public dataset cannot be reached.")
 
 st.divider()
-st.markdown("### Data, methods and limitations")
+st.markdown('<div class="section-tag">06 / Transparency</div>', unsafe_allow_html=True)
+st.markdown("### Sources, methods & known blind spots")
 d1, d2, d3 = st.columns(3)
 with d1:
     st.markdown("**Street network**")
