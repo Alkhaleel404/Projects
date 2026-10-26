@@ -1,162 +1,96 @@
 # RainRoute NYC
 
-RainRoute NYC is a Queens-focused civic technology research app. It compares real walking-route options with nearby historical NYC FloodNet sensor observations, making the relationship between geographic evidence and its limitations visible.
+**A Queens-focused civic evidence tool for exploring walking routes and nearby historical flood-sensor records.**
 
-> **Important:** RainRoute is experimental. It is not an emergency service, a safety-certified navigation app, or a source of verified current sidewalk conditions. FloodNet events are historical measurements at fixed sensors. No route is labelled safe or unsafe.
+RainRoute asks a narrow question: *What can public flood data tell us—and what can’t it tell us—about a mapped walking route?* It combines OpenStreetMap-based pedestrian routes with NYC FloodNet’s returned historical sensor records and makes the uncertainty visible instead of inventing a safety score.
 
-## Feature inventory
+> **Not for emergency decisions.** RainRoute does not detect live street flooding, verify current sidewalk conditions, or certify a route as safe or accessible. Historical sensor records are not live flood status. A route with no nearby records may still be flooded. Follow current official alerts and local instructions.
 
-### 1. Real walking-route planning
-- Enter a starting point and destination as public place names, landmarks, or street addresses.
-- Geocode each entry with OpenStreetMap Nominatim, requesting one result and restricting results to a Queens-area bounding box.
-- Validate endpoint text length, require both endpoints, reject identical endpoint text, and reject geocoded points outside the configured study area.
-- Request pedestrian routes from a public OpenStreetMap-based walking-routing service.
-- Display up to three route alternatives when the service returns them.
-- Show route distance and the routing service's estimated travel time.
-- Keep successful route results in the current Streamlit session so the user can inspect route options without resubmitting the form.
-- Provide source-specific messages for invalid locations, failed route requests, malformed service responses, and unavailable public services.
+## What it does
 
-### 2. Interactive route map
-- Render the actual returned route geometry on an interactive Folium/Leaflet map.
-- Draw up to three route alternatives with different colours.
-- Emphasize the currently selected route with a thicker, more opaque line.
-- Mark origin and destination.
-- Display route tooltips with route number and distance.
-- Display historical FloodNet sensor-event markers within 300 metres of the selected route.
-- Show sensor popups with sensor name, event timestamp, maximum measured depth, event duration, and distance from the selected route.
-- Include map zoom/pan controls, scale, and a layer control.
-- Attribute the underlying OpenStreetMap map data.
+- **Maps real route alternatives** between two entered Queens locations, when public services return them.
+- **Compares route geometry** by distance and the routing service’s estimated travel time.
+- **Shows nearby FloodNet evidence** by measuring the approximate distance from sensor points to the selected route.
+- **Makes limitations explicit**: the 300 m radius is a display filter, not a validated impact zone. The current data request is limited, and the display uses the latest returned historical record for each matched sensor—not a complete count of all past flood events.
+- **Keeps the experience low-data**: no account, device geolocation, app database, saved trip history, or public report submission.
 
-### 3. Historical FloodNet evidence linked to route geometry
-- Fetch public NYC Open Data / FloodNet historical sensor-event records and sensor deployment metadata.
-- Use sensor coordinates to compare each event point with the selected route's actual polyline.
-- Calculate approximate point-to-route distance using a local equirectangular projection appropriate for short distances in Queens.
-- Display returned events within 300 metres of the selected route.
-- Show sensor name, recorded event timestamp, maximum measured depth in inches, event duration in minutes, and distance to the route.
-- Order displayed events by proximity and timestamp and cap the displayed list at 12.
-- Show the count of returned events within the 300-metre display radius.
-- Show the data retrieval timestamp when supplied by the data client.
-- Explain when no matching events are returned and keep the route available if FloodNet context cannot be loaded.
+## How to read the results
 
-The 300-metre threshold is a display filter, not a validated flood-impact radius. Sensor coverage is sparse, events are historical, and a sensor measurement does not establish conditions on a nearby sidewalk or crossing. No matching event does not mean that a route is dry.
+| You see | It means | It does **not** mean |
+|---|---|---|
+| Route line | A public routing service returned this path from OpenStreetMap-based network data | Every sidewalk, crossing, curb ramp, or path is present, open, safe, or accessible |
+| Distance and time | The routing service’s estimate for the returned route | A guarantee of actual travel time |
+| Nearby FloodNet record | A historical measurement was associated with a sensor near the route | That the route is flooded now—or that nearby streets are dry |
+| No nearby records | No records returned by this query met the app’s distance filter | No flood risk or no past flooding |
 
-### 4. Route comparison
-- Select an individual route for detailed inspection.
-- Show selected-route metrics for distance, estimated travel time, and number of available alternatives.
-- Compare every returned alternative in a table with distance, estimated time, and number of nearby historical FloodNet events.
-- Calculate the nearby-event count separately against each route's own geometry.
-- Explain that historical-event counts are context only, not a safety score; the app does not rank routes as safe or unsafe.
+The app does not calculate a route safety score, predict flooding, or label routes safe/unsafe. FloodNet context can fail independently while route results remain available.
 
-### 5. Interface and user experience
-- RainRoute NYC-branded hero section with Queens civic-technology context.
-- Clear experimental-use and uncertainty notice.
-- Two-field route-entry form and primary route-finding action.
-- Dashboard-style metric cards, map and evidence columns, historical-event cards, and route-comparison table.
-- Custom typography, colour palette, spacing, borders, rounded panels, and narrow-screen CSS adjustments.
-- Separate data/methods/limitations section describing the street network, flood observations, privacy, and uncertainty.
-- Source attribution and explanatory captions near the map and results.
+## Data sources
 
-### 6. Privacy and security protections
-- No account registration or login.
-- No request for browser/device geolocation.
-- No user database or saved endpoint-history feature.
-- No public flood-report submission feature.
-- Input length checks and Queens-area geographic bounds checks.
-- HTTPS-only outbound requests to an explicit hostname allowlist.
-- Network timeouts, response-size limits, JSON parsing checks, and source-specific error handling.
-- Type/range checks for geocoded coordinates and route geometry before rendering.
-- Streamlit caching to reduce repeated requests.
-- Clear disclosure that place text is sent to Nominatim and route coordinates are sent to the public routing service; those providers may log requests.
-- A warning not to enter sensitive personal information.
+- [OpenStreetMap Nominatim](https://operations.osmfoundation.org/policies/nominatim/) — place-name/address geocoding.
+- [OpenStreetMap contributors](https://www.openstreetmap.org/copyright) — map and pedestrian-network data (© OpenStreetMap contributors, ODbL).
+- [FOSS GIS public routing service](https://routing.openstreetmap.de/about.html) — route geometry, distance, and estimated time.
+- [NYC Open Data / FloodNet historical street-flooding events](https://data.cityofnewyork.us/Environment/FloodNet-Street-Flooding-Events-Measured-by-FloodN/aq7i-eu5q) and [FloodNet project](https://www.floodnet.nyc/) — historical sensor-event summaries and deployment metadata.
 
-These protections reduce some risks but do not constitute a professional security audit. Third-party services may retain request logs, and no security or availability guarantee is made.
-
-## Data sources and attribution
-
-- **OpenStreetMap Nominatim** — geocodes entered place names and addresses. [Usage policy](https://operations.osmfoundation.org/policies/nominatim/).
-- **OpenStreetMap contributors** — volunteered map and pedestrian-network data. [Copyright and ODbL attribution](https://www.openstreetmap.org/copyright).
-- **FOSS GIS public routing service** — calculates route geometry and service-generated distance/time estimates. [Service information](https://routing.openstreetmap.de/about.html).
-- **NYC Open Data / FloodNet** — historical sensor-event summaries and sensor deployment metadata. [FloodNet event dataset](https://data.cityofnewyork.us/Environment/FloodNet-Street-Flooding-Events-Measured-by-FloodN/aq7i-eu5q) · [FloodNet project](https://www.floodnet.nyc/).
-
-Public services can be unavailable, incomplete, rate-limited, or updated independently. OpenStreetMap data does not certify sidewalk continuity, crossings, curb ramps, or accessibility. Route estimates do not account reliably for an individual's walking speed, mobility needs, weather, current closures, or flooding.
+See [DATA_SOURCES.md](DATA_SOURCES.md) for the source registry and [SECURITY_REVIEW.md](SECURITY_REVIEW.md) for privacy and security limits.
 
 ## Deploy on Streamlit Community Cloud
 
-RainRoute is a Streamlit app and can be hosted directly from this repository. No API keys or secrets are required for the current feature set.
-
-1. Push the project to a GitHub repository you control.
+1. Confirm the repository is pushed to your GitHub account: `Alkhaleel404/Projects`.
 2. Open [Streamlit Community Cloud](https://share.streamlit.io/) and sign in with GitHub.
-3. Choose **Create app**, then select repository `Alkhaleel404/Projects`, branch `main`, and main file path `app.py`.
-4. In **Advanced settings**, select Python **3.12** if a version is requested. Leave secrets empty; the current app does not need them.
-5. Deploy. When the app finishes building, open its generated `.streamlit.app` URL and test a Queens origin and destination.
-6. After later commits to `main`, check the app's deployment status and logs if the hosted version does not update.
+3. Choose **Create app**, repository **Alkhaleel404/Projects**, branch **main**, and main file **app.py**.
+4. Choose **Python 3.12** in Advanced settings if prompted. No secrets are required for the current version.
+5. Deploy and wait for the build to finish. Copy the generated `.streamlit.app` URL.
+6. Run the release smoke test below before sharing the link.
 
-If you fork or move the repository, choose your own repository and branch in step 3. The public geocoding, routing, and FloodNet services can rate-limit requests or be temporarily unavailable. Deployment does not make those services more reliable.
+**A GitHub commit does not itself publish the website.** The repository owner must complete hosting setup and confirm that the live URL works. See [DEPLOYMENT.md](DEPLOYMENT.md).
 
-### Release smoke test
+## Local setup
 
-Before sharing the URL with judges, test the deployed app in a fresh browser session:
+Python 3.12 is recommended. From the repository root:
 
-- [ ] The page loads without a Python traceback.
-- [ ] A known Queens origin and destination return at least one route, when public services are available.
-- [ ] The map shows the route geometry and origin/destination markers.
-- [ ] Historical FloodNet context either loads with timestamps or shows a clear unavailable/empty state.
-- [ ] Route alternatives can be selected and their metrics update.
-- [ ] An invalid or out-of-area location produces a useful message instead of crashing.
-- [ ] The limitations and privacy notice are visible.
-- [ ] Test on a phone-sized viewport as well as desktop.
-
-Do not call the app production-validated until this smoke test has been completed. The app is an educational research demonstration, not an emergency service.
-
-## Run locally
-
-Requirements: Python 3.11 or newer and an internet connection.
-
-### Windows (PowerShell)
-
-From the repository folder:
-
+**Windows PowerShell**
 ```powershell
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe -m streamlit run app.py --server.address 127.0.0.1
-```
-
-If Python 3.12 is not installed, use `py -0p` to inspect installed versions and create the environment with an installed supported Python version.
-
-### macOS / Linux
-
-```bash
-python3 -m venv .venv
-.venv/bin/python -m pip install --upgrade pip
-.venv/bin/python -m streamlit run app.py --server.address 127.0.0.1
-```
-
-Open the local URL printed by Streamlit. Keep the terminal open while using the app.
-
-## Testing
-
-Run the repository's unit tests:
-
-```powershell
+.\.venv\Scripts\python.exe -m compileall -q .
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe -m streamlit run app.py
 ```
 
-The existing unit tests cover supporting/data-validation modules; they do not replace end-to-end tests of the live geocoder, router, FloodNet service, browser rendering, or accessibility. The app must be run and checked against live services before it is treated as production-ready.
+**macOS / Linux**
+```bash
+python3.12 -m venv .venv
+.venv/bin/python -m pip install --upgrade pip
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m compileall -q .
+.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python -m streamlit run app.py
+```
 
-## Not included / limitations
+Keep the terminal open and use the local URL printed by Streamlit. The app requires an internet connection to contact its public data services.
 
-RainRoute does **not** currently provide:
-- Verified live sidewalk-flooding detection or official street-closure data.
-- A validated flood-risk model, machine-learning model, or route safety score.
-- Certified wheelchair-accessibility routing.
-- Emergency navigation, evacuation instructions, or a guarantee that any route is safe.
-- User accounts, saved trips, user-submitted reports, or location history.
-- FEMA flood-zone, National Weather Service forecast/alert, or NYC stormwater scenario layers in the current route-planning interface. These sources are discussed in the source registry but are not used to score routes.
+## Release smoke test
 
-Consult official NYC and National Weather Service information and follow local authorities' instructions. Do not use RainRoute for emergency decisions.
+- [ ] App opens without a traceback in a fresh/private browser.
+- [ ] A known Queens origin and destination return a route when public services are available.
+- [ ] Route lines, origin/destination markers, and route selection work.
+- [ ] Historical records load, or the app displays a clear unavailable/empty state.
+- [ ] Changing the selected route updates route metrics and nearby-record context.
+- [ ] Invalid and out-of-area locations produce a useful message.
+- [ ] Privacy and uncertainty notices are visible.
+- [ ] Layout is usable on desktop and a phone-sized screen.
+- [ ] GitHub Actions validation passes on the deployed commit.
 
-## License
+Do not describe the app as production-validated until these checks are completed. Automated unit tests do not verify live third-party services, deployment health, accessibility, or emergency-use suitability.
 
-No license has been selected for the project. Publishing a repository on GitHub does not automatically grant others permission to reuse, modify, or redistribute the code. Choose a license before inviting reuse or contributions.
+## Current limitations and next improvements
+
+- Historical FloodNet coverage is sparse and the current request is bounded; it is not a complete historical archive.
+- No route-specific live flood observations or alert overlay is currently integrated.
+- Public geocoding and routing services can rate-limit requests or be unavailable, and providers may log submitted place text or coordinates.
+- OpenStreetMap data does not guarantee sidewalk continuity, curb ramps, crossings, closures, or accessibility.
+- Formal accessibility testing, load testing, and a professional security audit have not been performed.
+
+The most valuable next technical step is to integrate clearly timestamped official alerts as a separate context panel—not to turn incomplete data into a misleading “safe route” score.
