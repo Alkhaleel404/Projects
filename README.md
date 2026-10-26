@@ -143,6 +143,4 @@ No license has been selected for this project.
 Publishing a repository on GitHub does not automatically grant others permission to reuse, modify, or redistribute its code. Select an appropriate open-source license before inviting others to use or contribute to the project.
 
 No license has been selected for this project. Publishing the repository on GitHub does not by itself grant permission to reuse, modify, or redistribute its code. Add a license that reflects your intent before inviting others to use or contribute to it.
-#� �P�r�o�j�e�c�t�s�
-�
-�
+
