@@ -1,5 +1,5 @@
 # RainRoute NYC
- 
+
 RainRoute NYC is a Queens-focused civic technology learning app about flood information and uncertainty. It compares routes on a small, fictional pedestrian graph and presents public flood and weather information as separate kinds of context.
 
 > **Important:** RainRoute NYC is an educational demonstration, not a navigation, emergency, or street-condition service. The demo routes and reports are fictional. Nothing in the app can tell you whether a street or route is safe now. Follow official alerts and emergency instructions.
@@ -18,49 +18,108 @@ All demo locations, route segments, distances, and sample reports are simulated.
 
 ### Requirements
 
-- Python 3.11 or newer
-- Git (optional, if cloning the repository)
+- Python **3.12 recommended** (Python 3.11 or newer is intended; the project's CI tests with Python 3.12).
+- Git, if you want to clone the repository instead of downloading it.
+- An internet connection to install dependencies and retrieve public data.
 
-### Installation on Windows
+### 1. Get the project files
 
-Open PowerShell in the project directory and run:
+Choose one option.
 
-```powershell
-py -3 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-python -m streamlit run app.py --server.address 127.0.0.1
+**Option A — Clone with Git**
+
+Open PowerShell (Windows) or a terminal (macOS/Linux), navigate to the folder where you keep projects, and run:
+
+```bash
+git clone https://github.com/Alkhaleel404/Projects.git
+cd Projects
 ```
 
-### Installation on macOS or Linux
+**Option B — Download from GitHub**
 
-Open a terminal in the project directory and run:
+1. Open https://github.com/Alkhaleel404/Projects
+2. Select **Code → Download ZIP**.
+3. Extract the ZIP.
+4. Open a terminal in the extracted `Projects` folder — the folder that contains `app.py` and `requirements.txt`.
+
+**Check that you are in the right folder before continuing.** These files should appear in the listing:
+
+PowerShell:
+```powershell
+Get-ChildItem app.py, requirements.txt
+```
+
+macOS/Linux:
+```bash
+ls app.py requirements.txt
+```
+
+If either file cannot be found, you are not in the project directory yet. Use `cd` to move into the folder that contains them. Do not run the installation commands from your home directory unless the project files are there.
+
+### 2. Install and run on Windows
+
+In PowerShell, from the project directory, run:
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m streamlit run app.py --server.address 127.0.0.1
+```
+
+These commands call the virtual environment's Python directly, so you do **not** need to activate it or change PowerShell's execution policy. If Python 3.12 is not installed, install it first or use another supported Python version that is installed; check available Python versions with `py -0p`.
+
+### 3. Install and run on macOS or Linux
+
+From the project directory, run:
 
 ```bash
 python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-python -m streamlit run app.py --server.address 127.0.0.1
+.venv/bin/python -m pip install --upgrade pip
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m streamlit run app.py --server.address 127.0.0.1
 ```
 
-Open the local address printed by Streamlit in your browser.
+### 4. Open the app
 
-The app does not require API keys or bundled datasets. Binding to `127.0.0.1` keeps the development server accessible only from your own computer.
+Streamlit prints a local address in the terminal. Open that address in your browser. The server is bound to `127.0.0.1`, which makes it accessible from your own computer rather than directly from other devices on your network.
+
+Keep the terminal open while using the app. To stop the server, press `Ctrl+C` in that terminal.
+
+### Troubleshooting
+
+- **`requirements.txt` or `app.py` not found:** You are probably in the wrong directory. Navigate into the project folder and repeat the file check above.
+- **PowerShell says script execution is disabled:** The commands above do not use the activation script, so activation is unnecessary.
+- **`py -3.12` cannot find Python:** Python 3.12 may not be installed. Run `py -0p` to list installed versions, then install Python 3.12 or use an installed supported version.
+- **`No module named streamlit`:** Install dependencies using the virtual environment's Python command shown above, then launch Streamlit using that same Python executable.
+- **Dependency installation fails:** Confirm your Python version, internet connection, and the full error message. The CI workflow tests the project using Python 3.12.
+
+The app does not require API keys or bundled datasets. Public-data features may depend on the availability of their external services.
 
 ## Testing
 
-Run the unit tests using Python's built-in `unittest` framework:
+Run the unit tests from the project directory.
 
+Windows:
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+```
+
+macOS/Linux:
 ```bash
-python -m unittest discover -s tests -v
+.venv/bin/python -m unittest discover -s tests -v
 ```
 
 To check that the application and its core modules compile:
 
+Windows:
+```powershell
+.\.venv\Scripts\python.exe -m compileall -q app.py routing.py flood_data.py preparedness.py data_sources.py
+```
+
+macOS/Linux:
 ```bash
-python -m compileall -q app.py routing.py flood_data.py preparedness.py data_sources.py
+.venv/bin/python -m compileall -q app.py routing.py flood_data.py preparedness.py data_sources.py
 ```
 
 ## Project Structure
@@ -138,9 +197,4 @@ Before deployment, verify that the public-data integrations, privacy disclosures
 
 ## License
 
-No license has been selected for this project.
-
-Publishing a repository on GitHub does not automatically grant others permission to reuse, modify, or redistribute its code. Select an appropriate open-source license before inviting others to use or contribute to the project.
-
-No license has been selected for this project. Publishing the repository on GitHub does not by itself grant permission to reuse, modify, or redistribute its code. Add a license that reflects your intent before inviting others to use or contribute to it.
-
+No license has been selected for this project. Publishing a repository on GitHub does not automatically grant others permission to reuse, modify, or redistribute its code. Select an appropriate open-source license before inviting others to use or contribute to the project.
