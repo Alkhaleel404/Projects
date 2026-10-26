@@ -524,6 +524,25 @@ def fetch_floodnet_events() -> dict[str, Any]:
     return normalize_floodnet_records(event_rows, sensor_rows)
 
 
+
+def fetch_floodnet_sensor_locations() -> list[dict[str, Any]]:
+    """Fetch the public Queens FloodNet sensor inventory, including sensors without returned events."""
+    from coverage_analysis import normalize_sensor_locations
+
+    query = urlencode({
+        "$select": "sensor_id,sensor_name,latitude,longitude,borough",
+        "$where": "borough='Queens'",
+        "$limit": "1000",
+    })
+    rows = _request_json(f"{FLOODNET_SENSORS_URL}?{query}")
+    if not isinstance(rows, list):
+        raise DataSourceError("NYC Open Data returned an invalid FloodNet sensor inventory.")
+    sensors = normalize_sensor_locations(rows)
+    if not sensors:
+        raise DataSourceError("No valid Queens FloodNet sensor locations were returned.")
+    return sensors
+
+
 def parse_source_timestamp(value: str | None) -> datetime | None:
     if not value:
         return None
