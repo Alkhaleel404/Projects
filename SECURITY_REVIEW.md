@@ -1,32 +1,27 @@
-# Security review
+# Security and privacy review
 
-This is a project-level review of the current RainRoute NYC implementation, not a professional security audit, penetration test, or guarantee of security.
+This is a project-level review, not a professional security audit or a guarantee of security.
 
-## Controls implemented
+## Current design
 
-- No account system, report submission endpoint, user database, analytics SDK, API secret, or user geolocation. Source requests use fixed geographic references.
-- Outbound JSON requests are restricted to HTTPS and an allowlist of the official FEMA, NWS, and NYC Open Data hosts. Redirect targets are checked against the same allowlist; response reads have a byte limit and a timeout.
-- FEMA polygons, FloodNet values and coordinates, NWS forecast fields, and source timestamps are validated and bounded before use. Malformed/unavailable data is surfaced as a source-specific error instead of a success-shaped empty layer.
-- HTML originating from FloodNet sensor names and event times is escaped before being included in map popup/tooltip markup. FEMA attributes are not inserted into HTML labels.
-- The app uses a fixed list of route endpoints and a fixed report schema. There is no user-controlled path, address, narrative, photograph, or report content.
-- All seeded report and graph data are labeled simulated. Historical sensor events, modeled FEMA zones, forecast values, and alerts use separate UI sections and descriptions.
-- Streamlit usage statistics are disabled in `.streamlit/config.toml`. The documented local launch binds to `127.0.0.1`.
-- `.gitignore` excludes virtual environments, secrets files, environment files, logs, and serialized model artifacts. This project does not use a model or store credentials.
-- Core route and checklist computation runs locally. Public API timeouts and malformed JSON are handled as explicit data-source errors.
+- No account, user database, public report submission, analytics SDK, or device/browser geolocation.
+- Origin/destination text is sent to OpenStreetMap Nominatim for geocoding. The resulting coordinates are sent to the community-operated OpenStreetMap-based walking router. Both services may log requests; do not enter sensitive personal information.
+- FloodNet public data is fetched from NYC Open Data. No API secrets are required.
+- Requests are HTTPS-only and the JSON helper checks hostnames against a fixed allowlist, applies timeouts, caps response size, and handles HTTP/network/JSON errors.
+- Geocoded coordinates are checked against a Queens-area bounding box. Returned route coordinates and event coordinates are type-checked and range-checked before display.
+- Route geometry is real OpenStreetMap-based pedestrian routing. FloodNet event points are compared geometrically with the selected route and only shown within the documented 300 m display threshold.
+- The app does not convert historical measurements into a current safe/unsafe label. A missing event is not evidence that a route is dry.
+- Streamlit usage statistics are disabled in .streamlit/config.toml; the documented local command binds to 127.0.0.1.
 
-## Remaining risks and limitations
+## Remaining risks
 
-- Streamlit and mapping dependencies must be kept updated; this project has not undergone dependency-vulnerability scanning.
-- Public FEMA, NYC Open Data, NWS, and USGS tile services may observe ordinary network metadata, return stale/incomplete data, rate-limit, or become unavailable. A cloud deployment may additionally process visitor connection metadata.
-- USGS map tiles are requested by the browser. The tile provider can observe IP address and tile coordinates. No sensitive location is sent by the app, but this is not an anonymity guarantee.
-- A malicious or malformed upstream response could expose defects in the third-party JSON/map rendering libraries despite application validation.
-- The map is an informational display. It is not a life-safety system and has not been tested for use during emergencies.
-- Keyboard and semantic accessibility features are present where supported by Streamlit, but formal WCAG 2.2 AA evaluation and screen-reader/browser testing have not been performed.
-- No dependency lockfile is included; dependency resolution can change across installs. For a public deployment, pin and review resolved versions as part of release preparation.
+- Public geocoding/routing services are community services with fair-use limits and no guaranteed uptime. Providers may log request metadata and route coordinates.
+- OpenStreetMap data may be incomplete or stale; foot access, sidewalk continuity, curb ramps, crossing details, and closures are not guaranteed.
+- FloodNet sensors are sparse and events are historical. A sensor measurement does not describe the entire route or present conditions.
+- Third-party dependencies and public service responses can change. No dependency vulnerability scan, formal penetration test, or emergency-use validation has been performed.
+- Streamlit hosting may expose visitor connection metadata to the hosting provider. Before public deployment, review hosting and provider privacy policies and usage terms.
+- Formal WCAG accessibility testing and screen-reader/browser compatibility testing have not been completed.
 
-## Operational guidance
+## Responsible use
 
-- Do not add private keys or credentials to source control. The current integrations require no API key.
-- Keep demo reporting disabled unless a moderation, retention, rate-limiting, privacy, and deletion design is implemented.
-- If routing is upgraded, use a verified pedestrian network and routing profile, disclose third-party requests, validate sidewalk/accessibility attributes, and never infer a route's present safety from broad polygons.
-- Recheck source documentation, endpoints, service limits, licensing, and data timestamps before deployment or public presentation.
+RainRoute is a student civic technology research tool, not an emergency service or safety-certified navigation system. Follow official alerts and local emergency instructions. Do not rely on this app to decide whether a route is safe.
