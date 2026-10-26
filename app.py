@@ -69,29 +69,26 @@ def _cached_nws_alerts() -> dict[str, Any]:
 st.markdown(
     """
     <style>
-        .block-container { max-width: 1360px; padding-top: 2rem; padding-bottom: 3rem; }
-        h1, h2, h3 {
-            letter-spacing: -.025em;
+        .block-container { max-width: 1440px; padding-top: 1.6rem; padding-bottom: 3rem; }
+        h1, h2, h3 { letter-spacing: -.035em; }
+        h1 { font-size: clamp(2.2rem, 4vw, 3.5rem) !important; line-height: 1.03 !important; }
+        h2 { font-size: 1.55rem !important; }
+        [data-testid="stMetric"] { border: 1px solid rgba(15,118,110,.18); border-radius: 14px; padding: 15px 16px; background: rgba(15,118,110,.035); }
+        [data-testid="stVerticalBlockBorderWrapper"] { border-radius: 16px; border-color: rgba(20,50,50,.15); }
+        .eyebrow { font-size: .75rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #0f766e; }
+        .hero-panel { padding: clamp(1.2rem, 3vw, 2.4rem); border: 1px solid rgba(15,118,110,.2); border-radius: 22px; background: linear-gradient(135deg, rgba(15,118,110,.10), rgba(255,255,255,.72) 68%); }
+        .hero-kicker { display: inline-block; margin-bottom: .8rem; padding: .32rem .62rem; border-radius: 999px; background: #d9f1eb; color: #115e59; font-size: .75rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+        .hero-copy { max-width: 52rem; font-size: 1.08rem; line-height: 1.7; color: #355454; }
+        .section-kicker { color: #0f766e; font-size: .74rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+        .status-note { border: 1px solid rgba(180,83,9,.24); border-left: 4px solid #b45309; border-radius: 12px; padding: 13px 16px; background: rgba(245,158,11,.07); }
+        .feature-label { color: #0f766e; font-size: .74rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+        div.stButton > button { border-radius: 10px; min-height: 2.75rem; font-weight: 650; transition: border-color .15s ease, transform .15s ease; }
+        div.stButton > button:hover { border-color: #0f766e; transform: translateY(-1px); }
+        a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid #0b83a0 !important; outline-offset: 2px !important; }
+        @media (max-width: 700px) {
+            .block-container { padding: 1rem .85rem 2rem; }
+            h1 { font-size: 2.15rem !important; }
         }
-        [data-testid="stMetric"] {
-            border-radius: 12px; padding: 15px 16px;
-        }
-        [data-testid="stVerticalBlockBorderWrapper"] {
-            border-radius: 14px;
-        }
-        .eyebrow {
-            font-size: .78rem; font-weight: 750;
-            letter-spacing: .12em; text-transform: uppercase;
-        }
-        .status-note {
-            border-left: 4px solid currentColor; border-radius: 5px; padding: 12px 16px;
-        }
-    a:focus-visible, button:focus-visible, input:focus-visible {
-        outline: 3px solid #0b83a0 !important; outline-offset: 2px !important;
-    }
-    @media (max-width: 700px) {
-        .block-container { padding: 1rem .85rem 2rem; }
-    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -108,87 +105,85 @@ def _navigate_to_page(page: str) -> None:
 
 
 def _render_start_here() -> None:
-    _page_header(
-        "Flood-route learning lab",
-        "RainRoute NYC helps you explore how flood information and uncertainty affect route decisions—without pretending to know which streets are safe.",
-    )
     st.markdown(
-        '<div class="status-note"><strong>Important:</strong> this is a learning demonstration, '
-        'not a navigation or emergency service. Route geometry and sample reports are fictional. '
-        'Use official alerts and emergency guidance for real-world decisions.</div>',
+        """
+        <div class="hero-panel">
+          <div class="hero-kicker">Queens · Civic technology prototype</div>
+          <h1>Flood decisions deserve better context.</h1>
+          <p class="hero-copy">Explore how uncertain reports can change a route's ranking, and learn why public flood data is evidence—not a guarantee about any individual street.</p>
+        </div>
+        """,
         unsafe_allow_html=True,
     )
     st.write("")
-    st.subheader("What would you like to do?")
-    route_col, reports_col, evidence_col = st.columns(3, gap="medium")
-    with route_col:
+    st.markdown(
+        '<div class="status-note"><strong>Learning demo, not navigation.</strong> The route network, distances, and sample reports are fictional. Public datasets are shown separately and may have different coverage or timestamps. Do not use this app to choose a real-world route or make emergency decisions.</div>',
+        unsafe_allow_html=True,
+    )
+    st.write("")
+    main_col, preview_col = st.columns([1.05, 0.95], gap="large")
+    with main_col:
+        st.markdown('<div class="section-kicker">Start with the core experiment</div>', unsafe_allow_html=True)
+        st.subheader("Compare two possible routes")
+        st.write(
+            "Choose a start and destination, change the simulated report scenario, "
+            "and compare distance-only rankings with an illustrative report-weighted score."
+        )
+        st.button(
+            "Explore route comparison  →",
+            type="primary",
+            width="stretch",
+            on_click=_navigate_to_page,
+            args=("Route Explorer",),
+        )
+        st.caption("The scoring rule is a teaching heuristic—not a flood probability or safety rating.")
+    with preview_col:
         with st.container(border=True):
-            st.markdown("### Compare sample routes")
-            st.write(
-                "Choose two demo points, change the sample report scenario, and compare "
-                "distance-first versus report-weighted route rankings."
-            )
-            st.button(
-                "Open Route Explorer",
-                type="primary",
-                width="stretch",
-                on_click=_navigate_to_page,
-                args=("Route Explorer",),
-            )
+            st.markdown('<div class="feature-label">The demo network</div>', unsafe_allow_html=True)
+            st.graphviz_chart(_route_diagram(None), use_container_width=True)
+            st.caption("Fictional nodes and connections. No real streets or live route geometry.")
+    st.write("")
+    st.markdown('<div class="section-kicker">Explore the evidence</div>', unsafe_allow_html=True)
+    reports_col, evidence_col, prep_col = st.columns(3, gap="medium")
     with reports_col:
         with st.container(border=True):
-            st.markdown("### Explore sample reports")
-            st.write(
-                "Filter fictional reports by type, age, and segment. See why recent "
-                "unverified reports are not the same as verified conditions."
-            )
-            st.button(
-                "Open Flood Reports",
-                width="stretch",
-                on_click=_navigate_to_page,
-                args=("Flood Reports",),
-            )
+            st.markdown("### Sample reports")
+            st.write("Filter fictional reports by type, age, and route segment. Explore why unverified reports are not confirmed conditions.")
+            st.button("Explore reports", width="stretch", on_click=_navigate_to_page, args=("Flood Reports",))
     with evidence_col:
         with st.container(border=True):
-            st.markdown("### Check public flood context")
-            st.write(
-                "When available, view historical FloodNet events, FEMA hazard zones, "
-                "and NWS weather information as separate kinds of evidence."
-            )
-            st.button(
-                "Open FloodLens",
-                width="stretch",
-                on_click=_navigate_to_page,
-                args=("FloodLens",),
-            )
-
+            st.markdown("### Public flood context")
+            st.write("Inspect available FloodNet events, FEMA modeled hazard zones, and National Weather Service information separately.")
+            st.button("Open FloodLens", width="stretch", on_click=_navigate_to_page, args=("FloodLens",))
+    with prep_col:
+        with st.container(border=True):
+            st.markdown("### Preparedness")
+            st.write("Build a practical checklist for preparing for heavy rain and flooding, without collecting personal location data.")
+            st.button("Open checklist", width="stretch", on_click=_navigate_to_page, args=("Preparedness",))
     st.divider()
-    st.subheader("What is real, and what is a demonstration?")
+    st.markdown('<div class="section-kicker">Designed around uncertainty</div>', unsafe_allow_html=True)
+    st.subheader("What is real—and what is simulated?")
     real_col, demo_col = st.columns(2, gap="large")
     with real_col:
-        st.markdown("**Public data, when services respond**")
-        st.write(
-            "FloodLens retrieves public FloodNet sensor-event summaries, FEMA modeled "
-            "flood-hazard zones, and NWS forecast/alert context. These data have different "
-            "coverage and timestamps; none proves a particular sidewalk is flooded now."
-        )
+        with st.container(border=True):
+            st.markdown("**Public information, when services respond**")
+            st.write(
+                "FloodLens can retrieve public FloodNet sensor-event summaries, FEMA modeled "
+                "flood-hazard zones, and NWS forecast or alert context. Coverage and timestamps "
+                "vary. None of these sources proves that a particular sidewalk is flooded now."
+            )
     with demo_col:
-        st.markdown("**Simulated learning features**")
-        st.write(
-            "The Route Explorer network, distances, and Flood Reports are fictional. "
-            "There is no real pedestrian routing, geolocation, report submission, or "
-            "community-report database."
-        )
+        with st.container(border=True):
+            st.markdown("**Simulated learning features**")
+            st.write(
+                "The route graph, route distances, and Flood Reports are fictional. "
+                "There is no real pedestrian routing, geolocation, report submission, or "
+                "community-report database."
+            )
     st.info(
-        "For real flood warnings, check official NYC and National Weather Service channels. "
-        "Avoid floodwater; call 911 for immediate emergencies."
+        "For real flood warnings, consult official NYC and National Weather Service channels. "
+        "Avoid floodwater and follow local emergency guidance."
     )
-    st.button(
-        "Build a personal preparedness checklist",
-        on_click=_navigate_to_page,
-        args=("Preparedness",),
-    )
-
 
 def _format_timestamp(value: str | None) -> str:
     parsed = parse_source_timestamp(value)
